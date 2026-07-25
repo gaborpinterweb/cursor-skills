@@ -1,0 +1,63 @@
+{
+  "date": "YYYY-MM-DD HH:mm (TZ)",
+  "runId": "YYYY-MM-DD-HHmm",
+  "folder": "audit/YYYY-MM-DD-HHmm",
+  "commit": "abc1234",
+  "commitFull": "abc1234deadbeef...",
+  "commitUrl": "https://github.com/org/repo/commit/abc1234deadbeef...",
+  "commitDirty": false,
+  "skillName": "technical-seo-audit",
+  "skillDescription": "Runs a technical SEO audit on a static-site frontend, evaluates 60+ rules (15 checklist areas + Screaming Frog Issues), and writes a dated HTML report under audit/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results, attachments, and commit hash. Use when the user asks for a technical SEO audit, SEO scorecard, or audit report.",
+  "passRate": 0,
+  "counts": {
+    "fail": 0,
+    "partial": 0,
+    "pass": 0,
+    "unknown": 0,
+    "na": 0,
+    "scored": 0
+  },
+  "byPriority": {
+    "high": {
+      "fail": 0,
+      "partial": 0,
+      "pass": 0,
+      "unknown": 0,
+      "na": 0
+    },
+    "medium": {
+      "fail": 0,
+      "partial": 0,
+      "pass": 0,
+      "unknown": 0,
+      "na": 0
+    },
+    "low": {
+      "fail": 0,
+      "partial": 0,
+      "pass": 0,
+      "unknown": 0,
+      "na": 0
+    }
+  },
+  "attachments": [
+    {
+      "filename": "issues_overview_report.csv",
+      "path": "attachments/issues_overview_report.csv"
+    }
+  ],
+  "reportPath": "audit/YYYY-MM-DD-HHmm/index.html",
+  "handoffPath": "audit/YYYY-MM-DD-HHmm/handoff.md",
+  "skillSources": [
+    {
+      "filename": "SKILL.md",
+      "path": "skill-sources/SKILL.md"
+    },
+    {
+      "filename": "rules.md",
+      "path": "skill-sources/rules.md"
+    }
+  ],
+  "model": "Composer",
+  "analysisScope": "static site files"
+}

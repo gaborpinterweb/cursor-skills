@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Technical SEO Audit — {{DATE}}</title>
+  <link rel="stylesheet" href="report.css" />
+</head>
+<body>
+  <!-- Method modals: checkbox + label keeps the method sentence inline (no <details> line breaks). -->
+  <input type="checkbox" id="modal-skill" class="method-modal-toggle" />
+  <input type="checkbox" id="modal-rules" class="method-modal-toggle" />
+
+  <div class="method-modal method-modal-skill" role="dialog" aria-label="SKILL.md">
+    <label class="method-pop-backdrop" for="modal-skill" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head">
+        <h3>SKILL.md</h3>
+        <div class="skill-file-actions">
+          <a href="skill-sources/SKILL.md" target="_blank" rel="noopener">Open file</a>
+          <label class="method-pop-close" for="modal-skill">Close</label>
+        </div>
+      </div>
+      <pre class="skill-file-body">{{SKILL_MD}}</pre>
+    </div>
+  </div>
+
+  <div class="method-modal method-modal-rules" role="dialog" aria-label="rules.md">
+    <label class="method-pop-backdrop" for="modal-rules" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head">
+        <h3>rules.md</h3>
+        <div class="skill-file-actions">
+          <a href="skill-sources/rules.md" target="_blank" rel="noopener">Open file</a>
+          <label class="method-pop-close" for="modal-rules">Close</label>
+        </div>
+      </div>
+      <pre class="skill-file-body">{{RULES_MD}}</pre>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1>Technical SEO Audit</h1>
+        </div>
+      </div>
+      <dl class="meta-grid">
+        <div class="meta-item">
+          <dt>Date</dt>
+          <dd>{{DATE}}</dd>
+        </div>
+        <div class="meta-item">
+          <dt>Commit</dt>
+          <dd>{{COMMIT_HTML}}</dd>
+        </div>
+      </dl>
+      <div class="method">
+        <div class="method-line">A <a href="handoff.md" target="_blank" rel="noopener">handoff.md</a> was generated so agents can fix the failed and partial issues.</div>
+        <!-- Keep this sentence on ONE line in the generated HTML (labels only — no block tags). -->
+        <div class="method-line">This report was generated based on analysis performed by Cursor ({{MODEL}}) using the <label class="method-link" for="modal-skill">skill</label> and <label class="method-link" for="modal-rules">rules</label> over {{ANALYSIS_SCOPE}}, and the following attachments:</div>
+        <ul class="attachment-list">
+          <!-- If none: <li class="none">None provided.</li> -->
+          {{ATTACHMENTS}}
+        </ul>
+      </div>
+    </header>
+
+    <!-- 1) Summary card: pass rate + totals only -->
+    <section class="card summary">
+      <h2>Summary</h2>
+      <div class="summary-hero">
+        <div class="pass-rate score-average">
+          <div class="score-gauge" role="img" aria-label="Pass rate {{PASS_RATE}} percent">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="score-track" cx="60" cy="60" r="52" pathLength="100" />
+              <circle class="score-fill" cx="60" cy="60" r="52" pathLength="100"
+                stroke-dasharray="{{PASS_RATE}} 100" />
+            </svg>
+            <div class="score-center">
+              <span class="pass-rate-value">{{PASS_RATE}}%</span>
+            </div>
+          </div>
+          <div class="pass-rate-label">
+            <span class="pass-rate-fraction">{{COUNT_PASS}} succ. / {{COUNT_SCORED}} total</span>
+            <span class="pass-rate-pct">{{PASS_RATE}}% pass rate</span>
+          </div>
+        </div>
+        <div class="stat-tiles">
+          <!-- onclick switches to By priority so the target section is visible -->
+          <a class="stat-tile stat-fail" href="#prio-high-fail" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_FAIL}}</span>
+            <span class="stat-label">Failed</span>
+          </a>
+          <a class="stat-tile stat-partial" href="#prio-high-partial" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_PARTIAL}}</span>
+            <span class="stat-label">Partial</span>
+          </a>
+          <a class="stat-tile stat-pass" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_PASS}}</span>
+            <span class="stat-label">Passed</span>
+          </a>
+          <a class="stat-tile stat-unknown" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_UNKNOWN}}</span>
+            <span class="stat-label">Unknown</span>
+          </a>
+          <a class="stat-tile stat-na" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_NA}}</span>
+            <span class="stat-label">N/A</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2) View switch: drives Overview + issue list sorting -->
+    <div class="view-switch">
+      <input type="radio" name="audit-view" id="view-tab-priority" checked />
+      <input type="radio" name="audit-view" id="view-tab-rule" />
+      <div class="summary-tablist" role="tablist" aria-label="Issue sorting">
+        <label class="summary-tab" for="view-tab-priority" role="tab">By priority</label>
+        <label class="summary-tab" for="view-tab-rule" role="tab">By rule</label>
+      </div>
+
+      <!-- ===== BY PRIORITY ===== -->
+      <div class="view-panel view-panel-priority">
+        <section class="card overview">
+          <h2>Overview</h2>
+          <table class="priority-summary">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Failed</th>
+                <th>Partial</th>
+                <th>Passed</th>
+                <th>Unknown</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>High</td>
+                <td><a class="count count-fail" href="#prio-high-fail">{{H_FAIL}}</a></td>
+                <td><a class="count count-partial" href="#prio-high-partial">{{H_PARTIAL}}</a></td>
+                <td><a class="count count-pass" href="#prio-passed">{{H_PASS}}</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">{{H_UNKNOWN}}</a></td>
+                <td><a class="count count-na" href="#prio-passed">{{H_NA}}</a></td>
+              </tr>
+              <tr>
+                <td>Medium</td>
+                <td><a class="count count-fail" href="#prio-medium-fail">{{M_FAIL}}</a></td>
+                <td><a class="count count-partial" href="#prio-medium-partial">{{M_PARTIAL}}</a></td>
+                <td><a class="count count-pass" href="#prio-passed">{{M_PASS}}</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">{{M_UNKNOWN}}</a></td>
+                <td><a class="count count-na" href="#prio-passed">{{M_NA}}</a></td>
+              </tr>
+              <tr>
+                <td>Low</td>
+                <td><a class="count count-fail" href="#prio-low-fail">{{L_FAIL}}</a></td>
+                <td><a class="count count-partial" href="#prio-low-partial">{{L_PARTIAL}}</a></td>
+                <td><a class="count count-pass" href="#prio-passed">{{L_PASS}}</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">{{L_UNKNOWN}}</a></td>
+                <td><a class="count count-na" href="#prio-passed">{{L_NA}}</a></td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td><a class="count count-fail" href="#prio-high-fail">{{COUNT_FAIL}}</a></td>
+                <td><a class="count count-partial" href="#prio-high-partial">{{COUNT_PARTIAL}}</a></td>
+                <td><a class="count count-pass" href="#prio-passed">{{COUNT_PASS}}</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">{{COUNT_UNKNOWN}}</a></td>
+                <td><a class="count count-na" href="#prio-passed">{{COUNT_NA}}</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!--
+          Priority issue list anchors:
+          #prio-high-fail #prio-high-partial
+          #prio-medium-fail #prio-medium-partial
+          #prio-low-fail #prio-low-partial
+          #prio-passed
+        -->
+        {{PRIORITY_RESULTS}}
+      </div>
+
+      <!-- ===== BY RULE ===== -->
+      <div class="view-panel view-panel-rule">
+        <section class="card overview">
+          <h2>Overview</h2>
+          <!--
+            Fixed order from rules.md (1–15) + Attachment-driven / SF extras.
+            Count cells link to #area-T … #area-X (and Total → first area with fails, or #area-T).
+          -->
+          <table class="priority-summary rule-summary">
+            <thead>
+              <tr>
+                <th>Rule area</th>
+                <th>Failed</th>
+                <th>Partial</th>
+                <th>Passed</th>
+                <th>Unknown</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{AREA_ROWS}}
+            </tbody>
+          </table>
+        </section>
+
+        <!--
+          Rule issue list: one .area-group per area in fixed order.
+          Anchors: #area-T #area-C … #area-B #area-X
+          Structure:
+            <div id="area-T" class="result-group area-group">
+              <p class="section-label">1. Titles…</p>
+              <div class="area-body">
+                fail/partial rules…
+                <details class="passed-block">Passed, N/A & unknown…</details>
+              </div>
+            </div>
+        -->
+        {{RULE_RESULTS}}
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
