@@ -1,0 +1,63 @@
+{
+  "date": "YYYY-MM-DD HH:mm (TZ)",
+  "runId": "YYYY-MM-DD-HHmm",
+  "folder": "aeo-audit/YYYY-MM-DD-HHmm",
+  "commit": "abc1234",
+  "commitFull": "abc1234deadbeef...",
+  "commitUrl": "https://github.com/org/repo/commit/abc1234deadbeef...",
+  "commitDirty": false,
+  "skillName": "technical-aeo-audit",
+  "skillDescription": "Runs a technical Answer Engine Optimization (AEO) audit on a static-site frontend, evaluates ~47 rules across 10 checklist areas (plus Answerlint attachments), and writes a dated self-contained HTML report under aeo-audit/YYYY-MM-DD-HHmm/.",
+  "passRate": 0,
+  "counts": {
+    "fail": 0,
+    "partial": 0,
+    "pass": 0,
+    "unknown": 0,
+    "na": 0,
+    "scored": 0
+  },
+  "byPriority": {
+    "high": {
+      "fail": 0,
+      "partial": 0,
+      "pass": 0,
+      "unknown": 0,
+      "na": 0
+    },
+    "medium": {
+      "fail": 0,
+      "partial": 0,
+      "pass": 0,
+      "unknown": 0,
+      "na": 0
+    },
+    "low": {
+      "fail": 0,
+      "partial": 0,
+      "pass": 0,
+      "unknown": 0,
+      "na": 0
+    }
+  },
+  "attachments": [
+    {
+      "filename": "answerlint-report.json",
+      "path": "attachments/answerlint-report.json"
+    }
+  ],
+  "reportPath": "aeo-audit/YYYY-MM-DD-HHmm/index.html",
+  "handoffPath": "aeo-audit/YYYY-MM-DD-HHmm/handoff.md",
+  "skillSources": [
+    {
+      "filename": "SKILL.md",
+      "path": "skill-sources/SKILL.md"
+    },
+    {
+      "filename": "rules.md",
+      "path": "skill-sources/rules.md"
+    }
+  ],
+  "model": "Composer",
+  "analysisScope": "static site files"
+}

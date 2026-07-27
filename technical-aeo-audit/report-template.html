@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Technical AEO Audit — {{DATE}}</title>
+  <style>
+/* Technical AEO audit report — keep stable across runs */
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #5c5c5c;
+  --line: #e2e0d8;
+  --fail: #b42318;
+  --fail-bg: #fef3f2;
+  --partial: #b54708;
+  --partial-bg: #fffaeb;
+  --pass: #027a48;
+  --pass-bg: #ecfdf3;
+  --unknown: #344054;
+  --unknown-bg: #f2f4f7;
+  --na: #667085;
+  --na-bg: #f9fafb;
+  --high: #b42318;
+  --medium: #b54708;
+  --low: #175cd3;
+  --radius: 10px;
+  --font: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+a { color: #175cd3; }
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.header {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  letter-spacing: -0.02em;
+}
+
+.header .sub {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.method {
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+
+.method-line {
+  margin: 0 0 0.45rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.method-line + .attachment-list {
+  margin-top: 0.3rem;
+}
+
+.method-line a,
+.method-link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.method-line a:hover,
+.method-link:hover { color: #175cd3; }
+
+.method-modal-toggle {
+  /* fixed so focusing the checkbox does not scroll the page to top */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.method-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Each toggle is immediately followed by its modal panel */
+.method-modal-toggle:checked + .method-modal {
+  display: flex;
+}
+
+.method-pop-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.42);
+  cursor: pointer;
+}
+
+.method-pop-panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 94vw);
+  max-height: min(80vh, 820px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 48px rgba(26, 26, 26, 0.22);
+}
+
+.method-pop-panel .skill-file-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.method-pop-panel .skill-file-head h3 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.skill-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+
+.skill-file-actions a {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skill-file-actions a:hover { text-decoration: underline; }
+
+.method-pop-close {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.method-pop-close:hover {
+  border-color: #175cd3;
+  color: #175cd3;
+}
+
+.method-pop-copy {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.method-pop-copy:hover {
+  border-color: #175cd3;
+  color: #175cd3;
+}
+
+.method-pop-copy.is-copied {
+  border-color: var(--pass);
+  color: var(--pass);
+}
+
+.method-pop-panel .area-guide-body {
+  margin: 0;
+  padding: 0.85rem 1rem 1.1rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.method-pop-panel .area-guide-body h4 {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.method-pop-panel .area-guide-body h4:first-child {
+  margin-top: 0;
+}
+
+.method-pop-panel .area-guide-body p {
+  margin: 0 0 0.55rem;
+}
+
+.method-pop-panel .area-guide-body p:last-child {
+  margin-bottom: 0;
+}
+
+.method-pop-panel .skill-file-head.area-guide-head h3 {
+  font-family: var(--font);
+  font-size: 0.95rem;
+}
+
+.method-pop-panel .skill-file-body {
+  margin: 0;
+  padding: 0.85rem 0.95rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg);
+}
+
+.attachment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.attachment-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.attachment-list a:hover { border-color: #175cd3; color: #175cd3; }
+
+.attachment-list .none {
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.meta-item dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.meta-item dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.meta-item dd a.commit-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.meta-item dd a.commit-link:hover {
+  color: #175cd3;
+}
+
+.card,
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.card h2,
+.summary h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.overview h2 {
+  margin-bottom: 0.85rem;
+}
+
+.view-switch {
+  margin-bottom: 1.25rem;
+}
+
+.view-switch > input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.summary-tablist {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.summary-tab {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  user-select: none;
+}
+
+.summary-tab:hover { color: var(--ink); }
+
+#view-tab-priority:checked ~ .summary-tablist label[for="view-tab-priority"],
+#view-tab-rule:checked ~ .summary-tablist label[for="view-tab-rule"] {
+  color: var(--ink);
+  background: var(--bg);
+  border-color: var(--line);
+}
+
+.view-panel { display: none; }
+
+#view-tab-priority:checked ~ .view-panel-priority,
+#view-tab-rule:checked ~ .view-panel-rule {
+  display: block;
+}
+
+table.rule-summary td:first-child {
+  font-weight: 600;
+}
+
+table.rule-summary .area-num {
+  display: inline-block;
+  min-width: 1.35rem;
+  margin-right: 0.35rem;
+  color: var(--muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-hero {
+  display: grid;
+  grid-template-columns: minmax(140px, 170px) 1fr;
+  gap: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .summary-hero { grid-template-columns: 1fr; }
+}
+
+.pass-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.25rem;
+}
+
+.score-gauge {
+  position: relative;
+  width: 124px;
+  height: 124px;
+}
+
+.score-gauge svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.score-track,
+.score-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.score-track {
+  stroke: #e8e8e8;
+}
+
+.score-fill {
+  stroke: var(--score-color, var(--pass));
+  transition: stroke-dasharray 0.4s ease;
+}
+
+.score-poor { --score-color: #ff4e42; }
+.score-average { --score-color: #ffa400; }
+.score-good { --score-color: #0cce6b; }
+
+.score-poor .score-track { stroke: #ffdad6; }
+.score-average .score-track { stroke: #ffe6b8; }
+.score-good .score-track { stroke: #c9f0d8; }
+
+.score-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pass-rate-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--score-color, var(--pass));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pass-rate-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.pass-rate-fraction {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pass-rate-pct {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  .stat-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 420px) {
+  .stat-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.75rem 0.7rem;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  cursor: pointer;
+}
+
+.stat-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(26, 26, 26, 0.08);
+}
+
+.stat-tile.is-zero {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.stat-num {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-fail { background: var(--fail-bg); border-color: #fecdca; }
+.stat-fail .stat-num,
+.stat-fail .stat-label { color: var(--fail); }
+
+.stat-partial { background: var(--partial-bg); border-color: #fedf89; }
+.stat-partial .stat-num,
+.stat-partial .stat-label { color: var(--partial); }
+
+.stat-pass { background: var(--pass-bg); border-color: #abefc6; }
+.stat-pass .stat-num,
+.stat-pass .stat-label { color: var(--pass); }
+
+.stat-unknown { background: var(--unknown-bg); border-color: #d0d5dd; }
+.stat-unknown .stat-num,
+.stat-unknown .stat-label { color: var(--unknown); }
+
+.stat-na { background: var(--na-bg); border-color: #d0d5dd; }
+.stat-na .stat-num,
+.stat-na .stat-label { color: var(--na); }
+
+table.priority-summary {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+table.priority-summary th,
+table.priority-summary td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+table.priority-summary th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+table.priority-summary td:not(:first-child) {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+table.priority-summary th:not(:first-child) {
+  text-align: right;
+}
+
+table.priority-summary .total-row td {
+  border-bottom: none;
+  border-top: 2px solid var(--ink);
+  font-weight: 700;
+  padding-top: 0.7rem;
+}
+
+/* Overview row status (fail > partial > pass); applies to priority, rule, and Total */
+table.priority-summary tbody tr.row-fail td {
+  background: var(--fail-bg);
+}
+
+table.priority-summary tbody tr.row-partial td {
+  background: var(--partial-bg);
+}
+
+table.priority-summary tbody tr.row-pass td {
+  background: var(--pass-bg);
+}
+
+table.priority-summary tbody tr.row-fail td:first-child,
+table.priority-summary tbody tr.row-partial td:first-child,
+table.priority-summary tbody tr.row-pass td:first-child {
+  box-shadow: inset 3px 0 0 currentColor;
+}
+
+table.priority-summary tbody tr.row-fail td:first-child { color: var(--fail); }
+table.priority-summary tbody tr.row-partial td:first-child { color: var(--partial); }
+table.priority-summary tbody tr.row-pass td:first-child { color: var(--pass); }
+
+table.rule-summary .method-link {
+  font-weight: 600;
+}
+
+.count {
+  display: inline-block;
+  min-width: 1.5rem;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-decoration: none;
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  transition: background 0.12s ease;
+}
+
+.count:hover { filter: brightness(0.92); }
+
+.count-fail { color: var(--fail); background: var(--fail-bg); }
+.count-partial { color: var(--partial); background: var(--partial-bg); }
+.count-pass { color: var(--pass); background: var(--pass-bg); }
+.count-unknown { color: var(--unknown); background: var(--unknown-bg); }
+.count-na { color: var(--na); background: var(--na-bg); }
+
+.count-zero {
+  color: var(--muted);
+  background: transparent;
+  font-weight: 600;
+  cursor: default;
+  pointer-events: none;
+}
+
+.result-group {
+  scroll-margin-top: 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.section-label {
+  margin: 1.5rem 0 0.65rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* By-rule area cards: title is parent; issues nest under a dotted rail */
+.area-group {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem 1rem;
+  margin-bottom: 0.85rem;
+  scroll-margin-top: 1.25rem;
+}
+
+.area-group > .section-label {
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.area-body {
+  margin-left: 0.15rem;
+  padding-left: 0.95rem;
+  border-left: 2px dotted #c5c2b8;
+}
+
+.area-body > .rule {
+  margin-bottom: 0.45rem;
+}
+
+.area-body > .rule:last-child {
+  margin-bottom: 0;
+}
+
+.area-group .passed-block {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+.area-group .passed-block summary.group {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  color: #8a877c;
+}
+
+.area-group .passed-block .rule {
+  margin-left: 0.15rem;
+}
+
+.rule {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.rule summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+}
+
+.rule summary::-webkit-details-marker { display: none; }
+
+.rule summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+.rule[open] summary::after { content: "–"; }
+
+.rule[open] {
+  border-color: #d4d1c7;
+}
+
+.rule[open] summary {
+  background: #fafaf7;
+}
+
+.rule .body {
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+  background: #f0eee8;
+}
+
+.rule .body h4 {
+  margin: 0.85rem 0 0.25rem;
+  color: var(--ink);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rule .body p, .rule .body ul { margin: 0.25rem 0 0; }
+.rule .body ul { padding-left: 1.1rem; }
+
+.badge {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+}
+
+.badge-fail { background: var(--fail-bg); color: var(--fail); }
+.badge-partial { background: var(--partial-bg); color: var(--partial); }
+.badge-pass { background: var(--pass-bg); color: var(--pass); }
+.badge-unknown { background: var(--unknown-bg); color: var(--unknown); }
+.badge-na { background: var(--na-bg); color: var(--na); }
+
+.badge-id {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.prio {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+  border: 1px solid var(--line);
+}
+
+.prio-high { color: var(--high); border-color: #fecdca; background: #fff; }
+.prio-medium { color: var(--medium); border-color: #fedf89; background: #fff; }
+.prio-low { color: var(--low); border-color: #b2ddff; background: #fff; }
+
+.rule-title {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0.1rem;
+}
+
+.passed-block {
+  scroll-margin-top: 1.25rem;
+  margin-top: 1rem;
+}
+
+.passed-block summary.group {
+  font-weight: 700;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+  </style>
+</head>
+<body>
+  <!-- Method / area modals: each checkbox is immediately followed by its panel. -->
+  <input type="checkbox" id="modal-skill" class="method-modal-toggle" />
+  <div class="method-modal method-modal-skill" role="dialog" aria-label="SKILL.md">
+    <label class="method-pop-backdrop" for="modal-skill" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head">
+        <h3>SKILL.md</h3>
+        <div class="skill-file-actions">
+          <a href="skill-sources/SKILL.md" target="_blank" rel="noopener">Open file</a>
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-skill">Close</label>
+        </div>
+      </div>
+      <pre class="skill-file-body">{{EMBED_SKILL_MD}}</pre>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-rules" class="method-modal-toggle" />
+  <div class="method-modal method-modal-rules" role="dialog" aria-label="rules.md">
+    <label class="method-pop-backdrop" for="modal-rules" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head">
+        <h3>rules.md</h3>
+        <div class="skill-file-actions">
+          <a href="skill-sources/rules.md" target="_blank" rel="noopener">Open file</a>
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-rules">Close</label>
+        </div>
+      </div>
+      <pre class="skill-file-body">{{EMBED_RULES_MD}}</pre>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-B" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="1. AI crawler access">
+    <label class="method-pop-backdrop" for="modal-area-B" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>1. AI crawler access</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-B">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>If search and citation bots cannot fetch your pages, answer engines will not cite you—content quality never gets a chance.</p>
+        <h4>How to fix</h4>
+        <p>Ship a production robots.txt that does not blanket-block AI search agents (OAI-SearchBot, PerplexityBot, Claude-SearchBot/ClaudeBot as applicable). Document intentional training opt-outs (e.g. GPTBot) separately from search access, and declare Sitemap:.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-A" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="2. Answer-shaped content">
+    <label class="method-pop-backdrop" for="modal-area-A" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>2. Answer-shaped content</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-A">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Answer engines lift short, self-contained openings. Pages that bury the point under marketing fluff are harder to quote.</p>
+        <h4>How to fix</h4>
+        <p>Lead key pages with a direct answer (roughly 40–80 words), use question-shaped headings where intent is informational, and add FAQ blocks when multiple related questions are answered on-page.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-H" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="3. Extractable structure">
+    <label class="method-pop-backdrop" for="modal-area-H" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>3. Extractable structure</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-H">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Clean heading hierarchy and quotable passages make extraction reliable. Chaotic skips and vague pronouns reduce citability.</p>
+        <h4>How to fix</h4>
+        <p>Use one H1 per page type, keep H1→H2→H3 order sensible, write self-contained passages, and prefer lists/tables for steps and comparisons.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-F" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="4. FAQ / HowTo schema">
+    <label class="method-pop-backdrop" for="modal-area-F" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>4. FAQ / HowTo schema</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-F">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>FAQPage and HowTo JSON-LD help machines identify answer-eligible blocks when they match visible content. Skip when the page is not Q&A-shaped.</p>
+        <h4>How to fix</h4>
+        <p>When FAQ/Q&A is visible, add valid FAQPage JSON-LD that mirrors on-page pairs. Add HowTo only for real step procedures. Prefer n/a over fail when intent does not match.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-N" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="5. Entity & brand clarity">
+    <label class="method-pop-backdrop" for="modal-area-N" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>5. Entity & brand clarity</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-N">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Models need a clear “who” to attribute. Ambiguous brand/product naming and missing Organization markup weaken citations.</p>
+        <h4>How to fix</h4>
+        <p>Keep brand naming consistent, ship Organization/WebSite JSON-LD, expand acronyms on first use, and link Person entities where authorship is claimed.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-T" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="6. E-E-A-T / trust signals">
+    <label class="method-pop-backdrop" for="modal-area-T" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>6. E-E-A-T / trust signals</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-T">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Answer engines prefer sources that look accountable—named authors, credentials, and verifiable claims.</p>
+        <h4>How to fix</h4>
+        <p>Show author or org attribution on article/docs templates, link About/Contact, and avoid unsourced authority claims.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-D" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="7. Freshness">
+    <label class="method-pop-backdrop" for="modal-area-D" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>7. Freshness</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-D">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Recency is a common citation signal for changing topics. Stale cornerstone pages lose share of voice over time.</p>
+        <h4>How to fix</h4>
+        <p>Show publish/updated dates on time-sensitive content, set datePublished/dateModified in Article schema when used, and refresh flagship pages periodically.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-C" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="8. Citation readiness">
+    <label class="method-pop-backdrop" for="modal-area-C" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>8. Citation readiness</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-C">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Research (GEO / Aggarwal et al.) finds statistics, quotations, and cite-sources style content lift visibility in generative answers.</p>
+        <h4>How to fix</h4>
+        <p>Add verifiable facts and outbound proof links, include quotable attributions where helpful, and ship original examples or data on flagship pages—avoid keyword stuffing.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-V" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="9. Comparison & decision content">
+    <label class="method-pop-backdrop" for="modal-area-V" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>9. Comparison & decision content</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-V">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>“Best / vs / which” prompts need criteria and trade-offs. Pure docs pages can mark this area n/a.</p>
+        <h4>How to fix</h4>
+        <p>For comparative intent: state criteria, use tables or explicit trade-offs, name alternatives fairly, and clarify audience fit. Otherwise score n/a.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-X" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="10. Attachments & measurement">
+    <label class="method-pop-backdrop" for="modal-area-X" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>10. Attachments & measurement</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-X">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Answerlint JSON/CSV (and optional llms lint / prompt packs) are independent evidence—like Screaming Frog for SEO. Unmapped attachment fails leave measured gaps unexplained.</p>
+        <h4>How to fix</h4>
+        <p>When Answerlint is attached, map fail/warn checks into areas 1–9 and record scores in Evidence. Handle llms lint and prompt-pack results when provided; otherwise use unknown or n/a as noted in rules.md.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1>Technical AEO Audit</h1>
+        </div>
+      </div>
+      <dl class="meta-grid">
+        <div class="meta-item">
+          <dt>Date</dt>
+          <dd>{{DATE}}</dd>
+        </div>
+        <div class="meta-item">
+          <dt>Commit</dt>
+          <dd>{{COMMIT_HTML}}</dd>
+        </div>
+      </dl>
+      <div class="method">
+        <div class="method-line">A <a href="handoff.md" target="_blank" rel="noopener">handoff.md</a> was generated so agents can fix the failed and partial issues.</div>
+        <!-- Keep this sentence on ONE line in the generated HTML (labels only — no block tags). -->
+        <div class="method-line">This report was generated based on analysis performed by Cursor ({{MODEL}}) using the <label class="method-link" for="modal-skill">skill</label> and <label class="method-link" for="modal-rules">rules</label> over {{ANALYSIS_SCOPE}}, and the following attachments:</div>
+        <ul class="attachment-list">
+          <!-- If none: <li class="none">None provided.</li> -->
+          {{ATTACHMENTS}}
+        </ul>
+      </div>
+    </header>
+
+    <section class="card summary">
+      <h2>Summary</h2>
+      <div class="summary-hero">
+        <div class="pass-rate score-average">
+          <div class="score-gauge" role="img" aria-label="Pass rate {{PASS_RATE}} percent">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="score-track" cx="60" cy="60" r="52" pathLength="100" />
+              <circle class="score-fill" cx="60" cy="60" r="52" pathLength="100"
+                stroke-dasharray="{{PASS_RATE}} 100" />
+            </svg>
+            <div class="score-center">
+              <span class="pass-rate-value">{{PASS_RATE}}%</span>
+            </div>
+          </div>
+          <div class="pass-rate-label">
+            <span class="pass-rate-fraction">{{COUNT_PASS}} succ. / {{COUNT_SCORED}} total</span>
+            <span class="pass-rate-pct">{{PASS_RATE}}% pass rate</span>
+          </div>
+        </div>
+        <div class="stat-tiles">
+          <a class="stat-tile stat-fail" href="#prio-high-fail" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_FAIL}}</span>
+            <span class="stat-label">Failed</span>
+          </a>
+          <a class="stat-tile stat-partial" href="#prio-high-partial" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_PARTIAL}}</span>
+            <span class="stat-label">Partial</span>
+          </a>
+          <a class="stat-tile stat-pass" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_PASS}}</span>
+            <span class="stat-label">Passed</span>
+          </a>
+          <a class="stat-tile stat-unknown" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_UNKNOWN}}</span>
+            <span class="stat-label">Unknown</span>
+          </a>
+          <a class="stat-tile stat-na" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">{{COUNT_NA}}</span>
+            <span class="stat-label">N/A</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="view-switch">
+      <input type="radio" name="audit-view" id="view-tab-priority" checked />
+      <input type="radio" name="audit-view" id="view-tab-rule" />
+      <div class="summary-tablist" role="tablist" aria-label="Issue sorting">
+        <label class="summary-tab" for="view-tab-priority" role="tab">By priority</label>
+        <label class="summary-tab" for="view-tab-rule" role="tab">By rule</label>
+      </div>
+
+      <div class="view-panel view-panel-priority">
+        <section class="card overview">
+          <h2>Overview</h2>
+          <table class="priority-summary">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Failed</th>
+                <th>Partial</th>
+                <th>Passed</th>
+                <th>Unknown</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>High</td>
+                <td>{{H_FAIL}}</td>
+                <td>{{H_PARTIAL}}</td>
+                <td>{{H_PASS}}</td>
+                <td>{{H_UNKNOWN}}</td>
+                <td>{{H_NA}}</td>
+              </tr>
+              <tr>
+                <td>Medium</td>
+                <td>{{M_FAIL}}</td>
+                <td>{{M_PARTIAL}}</td>
+                <td>{{M_PASS}}</td>
+                <td>{{M_UNKNOWN}}</td>
+                <td>{{M_NA}}</td>
+              </tr>
+              <tr>
+                <td>Low</td>
+                <td>{{L_FAIL}}</td>
+                <td>{{L_PARTIAL}}</td>
+                <td>{{L_PASS}}</td>
+                <td>{{L_UNKNOWN}}</td>
+                <td>{{L_NA}}</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td>{{COUNT_FAIL_CELL}}</td>
+                <td>{{COUNT_PARTIAL_CELL}}</td>
+                <td>{{COUNT_PASS_CELL}}</td>
+                <td>{{COUNT_UNKNOWN_CELL}}</td>
+                <td>{{COUNT_NA_CELL}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        {{PRIORITY_RESULTS}}
+      </div>
+
+      <div class="view-panel view-panel-rule">
+        <section class="card overview">
+          <h2>Overview</h2>
+          <!--
+            Fixed order from rules.md (1–10): B A H F N T D C V X.
+            Rule area names open hardcoded Why / How to fix dialogs (modal-area-*).
+            Count cells link to #area-B … #area-X.
+          -->
+          <table class="priority-summary rule-summary">
+            <thead>
+              <tr>
+                <th>Rule area</th>
+                <th>Failed</th>
+                <th>Partial</th>
+                <th>Passed</th>
+                <th>Unknown</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="area-num">1.</span> <label class="method-link" for="modal-area-B">AI crawler access</label></td>
+                <td>{{AREA_B_FAIL}}</td>
+                <td>{{AREA_B_PARTIAL}}</td>
+                <td>{{AREA_B_PASS}}</td>
+                <td>{{AREA_B_UNKNOWN}}</td>
+                <td>{{AREA_B_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">2.</span> <label class="method-link" for="modal-area-A">Answer-shaped content</label></td>
+                <td>{{AREA_A_FAIL}}</td>
+                <td>{{AREA_A_PARTIAL}}</td>
+                <td>{{AREA_A_PASS}}</td>
+                <td>{{AREA_A_UNKNOWN}}</td>
+                <td>{{AREA_A_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">3.</span> <label class="method-link" for="modal-area-H">Extractable structure</label></td>
+                <td>{{AREA_H_FAIL}}</td>
+                <td>{{AREA_H_PARTIAL}}</td>
+                <td>{{AREA_H_PASS}}</td>
+                <td>{{AREA_H_UNKNOWN}}</td>
+                <td>{{AREA_H_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">4.</span> <label class="method-link" for="modal-area-F">FAQ / HowTo schema</label></td>
+                <td>{{AREA_F_FAIL}}</td>
+                <td>{{AREA_F_PARTIAL}}</td>
+                <td>{{AREA_F_PASS}}</td>
+                <td>{{AREA_F_UNKNOWN}}</td>
+                <td>{{AREA_F_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">5.</span> <label class="method-link" for="modal-area-N">Entity & brand clarity</label></td>
+                <td>{{AREA_N_FAIL}}</td>
+                <td>{{AREA_N_PARTIAL}}</td>
+                <td>{{AREA_N_PASS}}</td>
+                <td>{{AREA_N_UNKNOWN}}</td>
+                <td>{{AREA_N_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">6.</span> <label class="method-link" for="modal-area-T">E-E-A-T / trust signals</label></td>
+                <td>{{AREA_T_FAIL}}</td>
+                <td>{{AREA_T_PARTIAL}}</td>
+                <td>{{AREA_T_PASS}}</td>
+                <td>{{AREA_T_UNKNOWN}}</td>
+                <td>{{AREA_T_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">7.</span> <label class="method-link" for="modal-area-D">Freshness</label></td>
+                <td>{{AREA_D_FAIL}}</td>
+                <td>{{AREA_D_PARTIAL}}</td>
+                <td>{{AREA_D_PASS}}</td>
+                <td>{{AREA_D_UNKNOWN}}</td>
+                <td>{{AREA_D_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">8.</span> <label class="method-link" for="modal-area-C">Citation readiness</label></td>
+                <td>{{AREA_C_FAIL}}</td>
+                <td>{{AREA_C_PARTIAL}}</td>
+                <td>{{AREA_C_PASS}}</td>
+                <td>{{AREA_C_UNKNOWN}}</td>
+                <td>{{AREA_C_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">9.</span> <label class="method-link" for="modal-area-V">Comparison & decision content</label></td>
+                <td>{{AREA_V_FAIL}}</td>
+                <td>{{AREA_V_PARTIAL}}</td>
+                <td>{{AREA_V_PASS}}</td>
+                <td>{{AREA_V_UNKNOWN}}</td>
+                <td>{{AREA_V_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">10.</span> <label class="method-link" for="modal-area-X">Attachments & measurement</label></td>
+                <td>{{AREA_X_FAIL}}</td>
+                <td>{{AREA_X_PARTIAL}}</td>
+                <td>{{AREA_X_PASS}}</td>
+                <td>{{AREA_X_UNKNOWN}}</td>
+                <td>{{AREA_X_NA}}</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td>{{AREA_TOTAL_FAIL}}</td>
+                <td>{{AREA_TOTAL_PARTIAL}}</td>
+                <td>{{AREA_TOTAL_PASS}}</td>
+                <td>{{AREA_TOTAL_UNKNOWN}}</td>
+                <td>{{AREA_TOTAL_NA}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!--
+          Rule issue list: one .area-group per area in fixed order.
+          Anchors: #area-B #area-A … #area-X
+        -->
+        {{RULE_RESULTS}}
+      </div>
+    </div>
+
+  </div>
+  <script>
+    (function () {
+      function applyOverviewRowColors() {
+        document.querySelectorAll("table.priority-summary tbody tr").forEach(function (tr) {
+          var cells = tr.querySelectorAll("td");
+          if (cells.length < 3) return;
+          var fail = parseInt((cells[1].textContent || "0").replace(/\s+/g, ""), 10);
+          var partial = parseInt((cells[2].textContent || "0").replace(/\s+/g, ""), 10);
+          if (isNaN(fail)) fail = 0;
+          if (isNaN(partial)) partial = 0;
+          tr.classList.remove("row-fail", "row-partial", "row-pass");
+          if (fail > 0) tr.classList.add("row-fail");
+          else if (partial > 0) tr.classList.add("row-partial");
+          else tr.classList.add("row-pass");
+        });
+      }
+      applyOverviewRowColors();
+
+      /* Open/close modals without focusing the checkbox (avoids scroll-to-top). */
+      document.addEventListener("click", function (e) {
+        var label = e.target.closest("label[for]");
+        if (!label) return;
+        var input = document.getElementById(label.getAttribute("for"));
+        if (!input || !input.classList.contains("method-modal-toggle")) return;
+        e.preventDefault();
+        var closes = label.classList.contains("method-pop-close") || label.classList.contains("method-pop-backdrop");
+        input.checked = !closes;
+      });
+
+      document.querySelectorAll(".method-pop-copy").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var panel = btn.closest(".method-pop-panel");
+          if (!panel) return;
+          var body = panel.querySelector(".skill-file-body, .area-guide-body");
+          if (!body) return;
+          var text = body.tagName === "PRE" ? body.textContent : body.innerText;
+          function done() {
+            var prev = btn.textContent;
+            btn.textContent = "Copied";
+            btn.classList.add("is-copied");
+            setTimeout(function () {
+              btn.textContent = prev;
+              btn.classList.remove("is-copied");
+            }, 1500);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(function () {
+              fallbackCopy(text, done);
+            });
+          } else {
+            fallbackCopy(text, done);
+          }
+        });
+      });
+
+      function fallbackCopy(text, done) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (err) {}
+        document.body.removeChild(ta);
+        done();
+      }
+    })();
+  </script>
+</body>
+</html>

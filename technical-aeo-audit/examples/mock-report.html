@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Technical AEO Audit — 2026-07-27 06:56 (CEST)</title>
+  <style>
+/* Technical SEO audit report — keep stable across runs */
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #5c5c5c;
+  --line: #e2e0d8;
+  --fail: #b42318;
+  --fail-bg: #fef3f2;
+  --partial: #b54708;
+  --partial-bg: #fffaeb;
+  --pass: #027a48;
+  --pass-bg: #ecfdf3;
+  --unknown: #344054;
+  --unknown-bg: #f2f4f7;
+  --na: #667085;
+  --na-bg: #f9fafb;
+  --high: #b42318;
+  --medium: #b54708;
+  --low: #175cd3;
+  --radius: 10px;
+  --font: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+a { color: #175cd3; }
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.header {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  letter-spacing: -0.02em;
+}
+
+.header .sub {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.method {
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+
+.method-line {
+  margin: 0 0 0.45rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.method-line + .attachment-list {
+  margin-top: 0.3rem;
+}
+
+.method-line a,
+.method-link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.method-line a:hover,
+.method-link:hover { color: #175cd3; }
+
+.method-modal-toggle {
+  /* fixed so focusing the checkbox does not scroll the page to top */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.method-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Each toggle is immediately followed by its modal panel */
+.method-modal-toggle:checked + .method-modal {
+  display: flex;
+}
+
+.method-pop-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.42);
+  cursor: pointer;
+}
+
+.method-pop-panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 94vw);
+  max-height: min(80vh, 820px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 48px rgba(26, 26, 26, 0.22);
+}
+
+.method-pop-panel .skill-file-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.method-pop-panel .skill-file-head h3 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.skill-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+
+.skill-file-actions a {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skill-file-actions a:hover { text-decoration: underline; }
+
+.method-pop-close {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.method-pop-close:hover {
+  border-color: #175cd3;
+  color: #175cd3;
+}
+
+.method-pop-copy {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.method-pop-copy:hover {
+  border-color: #175cd3;
+  color: #175cd3;
+}
+
+.method-pop-copy.is-copied {
+  border-color: var(--pass);
+  color: var(--pass);
+}
+
+.method-pop-panel .area-guide-body {
+  margin: 0;
+  padding: 0.85rem 1rem 1.1rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.method-pop-panel .area-guide-body h4 {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.method-pop-panel .area-guide-body h4:first-child {
+  margin-top: 0;
+}
+
+.method-pop-panel .area-guide-body p {
+  margin: 0 0 0.55rem;
+}
+
+.method-pop-panel .area-guide-body p:last-child {
+  margin-bottom: 0;
+}
+
+.method-pop-panel .skill-file-head.area-guide-head h3 {
+  font-family: var(--font);
+  font-size: 0.95rem;
+}
+
+.method-pop-panel .skill-file-body {
+  margin: 0;
+  padding: 0.85rem 0.95rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg);
+}
+
+.attachment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.attachment-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.attachment-list a:hover { border-color: #175cd3; color: #175cd3; }
+
+.attachment-list .none {
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.meta-item dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.meta-item dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.meta-item dd a.commit-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.meta-item dd a.commit-link:hover {
+  color: #175cd3;
+}
+
+.card,
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.card h2,
+.summary h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.overview h2 {
+  margin-bottom: 0.85rem;
+}
+
+.view-switch {
+  margin-bottom: 1.25rem;
+}
+
+.view-switch > input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.summary-tablist {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.summary-tab {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  user-select: none;
+}
+
+.summary-tab:hover { color: var(--ink); }
+
+#view-tab-priority:checked ~ .summary-tablist label[for="view-tab-priority"],
+#view-tab-rule:checked ~ .summary-tablist label[for="view-tab-rule"] {
+  color: var(--ink);
+  background: var(--bg);
+  border-color: var(--line);
+}
+
+.view-panel { display: none; }
+
+#view-tab-priority:checked ~ .view-panel-priority,
+#view-tab-rule:checked ~ .view-panel-rule {
+  display: block;
+}
+
+table.rule-summary td:first-child {
+  font-weight: 600;
+}
+
+table.rule-summary .area-num {
+  display: inline-block;
+  min-width: 1.35rem;
+  margin-right: 0.35rem;
+  color: var(--muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-hero {
+  display: grid;
+  grid-template-columns: minmax(140px, 170px) 1fr;
+  gap: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .summary-hero { grid-template-columns: 1fr; }
+}
+
+.pass-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.25rem;
+}
+
+.score-gauge {
+  position: relative;
+  width: 124px;
+  height: 124px;
+}
+
+.score-gauge svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.score-track,
+.score-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.score-track {
+  stroke: #e8e8e8;
+}
+
+.score-fill {
+  stroke: var(--score-color, var(--pass));
+  transition: stroke-dasharray 0.4s ease;
+}
+
+.score-poor { --score-color: #ff4e42; }
+.score-average { --score-color: #ffa400; }
+.score-good { --score-color: #0cce6b; }
+
+.score-poor .score-track { stroke: #ffdad6; }
+.score-average .score-track { stroke: #ffe6b8; }
+.score-good .score-track { stroke: #c9f0d8; }
+
+.score-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pass-rate-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--score-color, var(--pass));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pass-rate-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.pass-rate-fraction {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pass-rate-pct {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  .stat-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 420px) {
+  .stat-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.75rem 0.7rem;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  cursor: pointer;
+}
+
+.stat-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(26, 26, 26, 0.08);
+}
+
+.stat-tile.is-zero {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.stat-num {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-fail { background: var(--fail-bg); border-color: #fecdca; }
+.stat-fail .stat-num,
+.stat-fail .stat-label { color: var(--fail); }
+
+.stat-partial { background: var(--partial-bg); border-color: #fedf89; }
+.stat-partial .stat-num,
+.stat-partial .stat-label { color: var(--partial); }
+
+.stat-pass { background: var(--pass-bg); border-color: #abefc6; }
+.stat-pass .stat-num,
+.stat-pass .stat-label { color: var(--pass); }
+
+.stat-unknown { background: var(--unknown-bg); border-color: #d0d5dd; }
+.stat-unknown .stat-num,
+.stat-unknown .stat-label { color: var(--unknown); }
+
+.stat-na { background: var(--na-bg); border-color: #d0d5dd; }
+.stat-na .stat-num,
+.stat-na .stat-label { color: var(--na); }
+
+table.priority-summary {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+table.priority-summary th,
+table.priority-summary td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+table.priority-summary th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+table.priority-summary td:not(:first-child) {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+table.priority-summary th:not(:first-child) {
+  text-align: right;
+}
+
+table.priority-summary .total-row td {
+  border-bottom: none;
+  border-top: 2px solid var(--ink);
+  font-weight: 700;
+  padding-top: 0.7rem;
+}
+
+/* Overview row status (fail > partial > pass); applies to priority, rule, and Total */
+table.priority-summary tbody tr.row-fail td {
+  background: var(--fail-bg);
+}
+
+table.priority-summary tbody tr.row-partial td {
+  background: var(--partial-bg);
+}
+
+table.priority-summary tbody tr.row-pass td {
+  background: var(--pass-bg);
+}
+
+table.priority-summary tbody tr.row-fail td:first-child,
+table.priority-summary tbody tr.row-partial td:first-child,
+table.priority-summary tbody tr.row-pass td:first-child {
+  box-shadow: inset 3px 0 0 currentColor;
+}
+
+table.priority-summary tbody tr.row-fail td:first-child { color: var(--fail); }
+table.priority-summary tbody tr.row-partial td:first-child { color: var(--partial); }
+table.priority-summary tbody tr.row-pass td:first-child { color: var(--pass); }
+
+table.rule-summary .method-link {
+  font-weight: 600;
+}
+
+.count {
+  display: inline-block;
+  min-width: 1.5rem;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-decoration: none;
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  transition: background 0.12s ease;
+}
+
+.count:hover { filter: brightness(0.92); }
+
+.count-fail { color: var(--fail); background: var(--fail-bg); }
+.count-partial { color: var(--partial); background: var(--partial-bg); }
+.count-pass { color: var(--pass); background: var(--pass-bg); }
+.count-unknown { color: var(--unknown); background: var(--unknown-bg); }
+.count-na { color: var(--na); background: var(--na-bg); }
+
+.count-zero {
+  color: var(--muted);
+  background: transparent;
+  font-weight: 600;
+  cursor: default;
+  pointer-events: none;
+}
+
+.result-group {
+  scroll-margin-top: 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.section-label {
+  margin: 1.5rem 0 0.65rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* By-rule area cards: title is parent; issues nest under a dotted rail */
+.area-group {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem 1rem;
+  margin-bottom: 0.85rem;
+  scroll-margin-top: 1.25rem;
+}
+
+.area-group > .section-label {
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.area-body {
+  margin-left: 0.15rem;
+  padding-left: 0.95rem;
+  border-left: 2px dotted #c5c2b8;
+}
+
+.area-body > .rule {
+  margin-bottom: 0.45rem;
+}
+
+.area-body > .rule:last-child {
+  margin-bottom: 0;
+}
+
+.area-group .passed-block {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+.area-group .passed-block summary.group {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  color: #8a877c;
+}
+
+.area-group .passed-block .rule {
+  margin-left: 0.15rem;
+}
+
+.rule {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.rule summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+}
+
+.rule summary::-webkit-details-marker { display: none; }
+
+.rule summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+.rule[open] summary::after { content: "–"; }
+
+.rule[open] {
+  border-color: #d4d1c7;
+}
+
+.rule[open] summary {
+  background: #fafaf7;
+}
+
+.rule .body {
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+  background: #f0eee8;
+}
+
+.rule .body h4 {
+  margin: 0.85rem 0 0.25rem;
+  color: var(--ink);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rule .body p, .rule .body ul { margin: 0.25rem 0 0; }
+.rule .body ul { padding-left: 1.1rem; }
+
+.badge {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+}
+
+.badge-fail { background: var(--fail-bg); color: var(--fail); }
+.badge-partial { background: var(--partial-bg); color: var(--partial); }
+.badge-pass { background: var(--pass-bg); color: var(--pass); }
+.badge-unknown { background: var(--unknown-bg); color: var(--unknown); }
+.badge-na { background: var(--na-bg); color: var(--na); }
+
+.badge-id {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.prio {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+  border: 1px solid var(--line);
+}
+
+.prio-high { color: var(--high); border-color: #fecdca; background: #fff; }
+.prio-medium { color: var(--medium); border-color: #fedf89; background: #fff; }
+.prio-low { color: var(--low); border-color: #b2ddff; background: #fff; }
+
+.rule-title {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0.1rem;
+}
+
+.passed-block {
+  scroll-margin-top: 1.25rem;
+  margin-top: 1rem;
+}
+
+.passed-block summary.group {
+  font-weight: 700;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+  </style>
+</head>
+<body>
+  <!-- Method / area modals: each checkbox is immediately followed by its panel. -->
+  <input type="checkbox" id="modal-skill" class="method-modal-toggle" />
+  <div class="method-modal method-modal-skill" role="dialog" aria-label="SKILL.md">
+    <label class="method-pop-backdrop" for="modal-skill" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head">
+        <h3>SKILL.md</h3>
+        <div class="skill-file-actions">
+          <a href="../SKILL.md" target="_blank" rel="noopener">Open file</a>
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-skill">Close</label>
+        </div>
+      </div>
+      <pre class="skill-file-body">---
+name: technical-aeo-audit
+description: &gt;-
+  Runs a technical Answer Engine Optimization (AEO) audit on a static-site
+  frontend, evaluates ~47 rules across 10 checklist areas (plus Answerlint
+  attachments), and writes a dated self-contained HTML report under
+  aeo-audit/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results,
+  attachments, and commit hash. Use when the user asks for an AEO audit, GEO
+  audit, AI visibility / citation readiness scorecard, or Answerlint-based
+  report.
+---
+
+# Technical AEO Audit
+
+Audit-only. Do **not** implement fixes. Produce a **self-contained HTML report** plus a handoff file for `technical-aeo-implement` (when that skill exists).
+
+## When to run
+
+User asks for a technical AEO / GEO / AI-visibility audit or scorecard, or attaches Answerlint JSON/CSV (or `llms lint` / prompt-pack) exports.
+
+## Inputs
+
+| Input | Required | Notes |
+|-------|----------|--------|
+| Codebase | Yes | Project root (prefer built HTML / SSG output for JS-heavy sites) |
+| Attachments | No | Answerlint audit JSON/CSV, `llms lint` output, optional prompt-pack CSV, schema validator screenshots |
+| Site URL | No | Optional context for live fetches — **do not** put in the HTML header |
+
+Copy every user-attached audit artifact into the report folder (see below).
+
+Primary free attachment: [Answerlint](https://www.npmjs.com/package/answerlint) (`npx answerlint audit …`).
+
+## Output layout
+
+Create (never reuse a folder name — each run gets its own directory):
+
+```text
+aeo-audit/YYYY-MM-DD-HHmm/
+  index.html              # Main report (open this) — self-contained (CSS inlined)
+  meta.json               # Machine-readable summary
+  handoff.md              # For technical-aeo-implement
+  skill-sources/
+    SKILL.md              # Verbatim copy used for this run
+    rules.md              # Verbatim copy used for this run
+  attachments/            # Copied originals
+    &lt;original-filename&gt;
+```
+
+- Always use **local date + time**: `aeo-audit/YYYY-MM-DD-HHmm/` (24h clock, zero-padded).
+- If that exact minute folder already exists, append seconds: `aeo-audit/YYYY-MM-DD-HHmmss/`.
+- Resolve **git commit**: `git rev-parse --short HEAD` (and note dirty tree if `git status --porcelain` is non-empty). If not a git repo, set commit to `n/a`.
+- Resolve **commit URL** from `git remote get-url origin` (or first remote):
+  - **GitHub** (`github.com`): `https://github.com/&lt;owner&gt;/&lt;repo&gt;/commit/&lt;full-sha&gt;`
+  - **GitLab** (`gitlab.com` or a host containing `gitlab`): `https://&lt;host&gt;/&lt;namespace&gt;/&lt;repo&gt;/-/commit/&lt;full-sha&gt;`
+  - Strip trailing `.git`; support SSH (`git@host:path.git`) and HTTPS remotes
+  - Use **full SHA** in the URL; display the **short** hash in the UI (link opens in a new tab: `target=&quot;_blank&quot;` `rel=&quot;noopener&quot;`)
+  - Dirty trees: keep the link on the hash only, append ` (dirty)` as plain text
+  - If no recognizable remote: plain text hash (no link)
+- Display **date with time and timezone** in the report header. Store the same in `meta.json` `date`. Store `commit`, `commitFull`, `commitUrl` (or `null`), `commitDirty` in `meta.json`.
+
+## Workflow
+
+1. Create `aeo-audit/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
+2. Copy all provided attachments into `attachments/` (preserve filenames). Record them in `meta.json` and the HTML header as links (`target=&quot;_blank&quot;` `rel=&quot;noopener&quot;`).
+3. Copy this skill’s `SKILL.md` and `rules.md` into `skill-sources/` (verbatim). Embed the same full text behind the clickable **skill** / **rules** words in the method line.
+4. Record `model` (Cursor model name) and `analysisScope` (`static site files` / `a live URL` / `static site files and a live URL`).
+5. Parse Answerlint JSON/CSV if present; map fail/warn checks into rules (see [rules.md](rules.md)).
+6. Evaluate **every rule** in [rules.md](rules.md) (47) against the codebase (+ attachments). Status: `pass` | `partial` | `fail` | `n/a` | `unknown`.
+7. Build `index.html` from [report-template.html](report-template.html). Keep the inlined `&lt;style&gt;` block and visual structure identical across runs. Do **not** emit a separate `report.css`.
+8. Write `meta.json` and `handoff.md`.
+9. Stop. Tell the user the path to `index.html`. Do not implement.
+
+## Status meanings (PageSpeed-like)
+
+| Status | UI label | Meaning |
+|--------|----------|---------|
+| `fail` | Failed | Broken / missing for important pages |
+| `partial` | Partially failed | Present but incomplete or inconsistent |
+| `pass` | Passed | Meets the rule |
+| `n/a` | N/A | Not applicable (excluded from fail rates) |
+| `unknown` | Unknown | Needs Answerlint / live prompt check; treat like non-pass in summary counts separately |
+
+## Priorities
+
+| Priority | When |
+|----------|------|
+| **High** | AI crawler access, answer-shaped openings, extractable structure, citation readiness, critical Answerlint fails |
+| **Medium** | Schema (when applicable), entities, trust, freshness, comparison pages, attachment mapping |
+| **Low** | Polish, optional llms.txt lint, soft citation style |
+
+## Report UI requirements
+
+`index.html` **must** include, in order:
+
+1. **Header** — report title **Technical AEO Audit**, **date with time + timezone in parentheses**, **commit hash** linked when possible (+ dirty flag if dirty). Do **not** show site URL, stack, or phase/before/after labels.
+2. **Method lines** (above the attachment chips) — two short sentences, in this order:
+
+   &gt; A [handoff.md](handoff.md) was generated so agents can fix the failed and partial issues.
+
+   &gt; This report was generated based on analysis performed by Cursor ({{MODEL}}) using the **skill** and **rules** over {{ANALYSIS_SCOPE}}, and the following attachments:
+
+   - End the second sentence with `attachments:` (colon) so it leads into the attachment chips
+   - The words **skill** and **rules** are underlined inline `&lt;label&gt;` controls that open modals with the **full verbatim** `SKILL.md` / `rules.md` (plus “Open file” + Copy)
+   - Link `handoff.md` with `target=&quot;_blank&quot;` `rel=&quot;noopener&quot;`
+   - Store `model` and `analysisScope` in `meta.json`
+3. **Attachments** — list of files in `attachments/`; each link opens in a **new tab**. If none: show `None provided.`
+4. **Summary card** — pass-rate circle + status tiles. `{{COUNT_SCORED}}` = pass + partial + fail + unknown (exclude n/a).
+5. **Tabs** — **By priority** (default) / **By rule**.
+6. **Overview card** — table for the active tab:
+   - **By priority** — High / Medium / Low / Total
+   - **By rule** — 10 checklist areas in fixed `rules.md` order (codes **B A H F N T D C V X**); count links scroll to `#area-B` … `#area-X`
+   - **Row colors** — red if Failed &amp;gt; 0, yellow if Failed = 0 and Partial &amp;gt; 0, else green (script applies `row-fail` / `row-partial` / `row-pass`)
+   - **Count cells** — full cell HTML: `&lt;a class=&quot;count …&quot;&gt;` or `&lt;span class=&quot;count count-zero&quot;&gt;0&lt;/span&gt;`
+   - **By rule names** — keep hardcoded `&lt;label class=&quot;method-link&quot; for=&quot;modal-area-…&quot;&gt;` and area-guide modals
+7. **Issue list** — priority view `#prio-high-fail` → … → `#prio-passed`; rule view `#area-B` … `#area-X` with `.area-group` cards
+8. Each rule is a **`&lt;details&gt;` collapse** with Why / Evidence / How to fix (optional Answerlint refs)
+9. **Method / area pops** — checkbox-driven modals with Copy + Close + backdrop; embeds via `{{EMBED_SKILL_MD}}` / `{{EMBED_RULES_MD}}`
+
+Zero counts: use `&lt;span class=&quot;count count-zero&quot;&gt;0&lt;/span&gt;` or `stat-tile is-zero` — not a link.
+
+Keep styles embedded in `index.html`. When filling embeds, replace only the `{{EMBED_*}}` placeholders inside `&lt;pre class=&quot;skill-file-body&quot;&gt;` (do not globally replace strings that may appear inside skill docs).
+
+Do not remove the footer script (row colors, scroll-safe modal open, Copy).
+
+## Scoring (headline)
+
+`passed / (passed + partial + fail + unknown)` as a percentage (exclude `n/a`).  
+Gauge: &amp;lt;50 poor (red), 50–89 average (orange), ≥90 good (green).
+
+## Handoff (`handoff.md`)
+
+Generate implementation tasks only for `fail` and `partial` rules with priority High then Medium (Low only if user asked for full polish):
+
+```markdown
+# AEO implement handoff — YYYY-MM-DD
+
+Commit: &lt;hash&gt;
+Report: aeo-audit/YYYY-MM-DD-HHmm/index.html
+
+## Tasks
+### IMP-001 — &lt;rule id&gt; — &lt;title&gt;
+- Priority: High|Medium|Low
+- Status: fail|partial
+- Why: …
+- Scope: …
+- Acceptance: …
+- Evidence: …
+```
+
+## Quality bar
+
+- Evaluate **all** rules in [rules.md](rules.md) (do not stop at 10 areas).
+- Every non-`pass` / non-`n/a` rule has evidence (path, Answerlint check name, or “not found in repo”).
+- Prefer `n/a` for FAQ/HowTo and comparison rules when page intent does not match.
+- Do not treat missing `llms.txt` as an automatic High fail unless the user requested LLM roadmap work.
+- Attachments that were provided appear in the header and open in a new tab.
+- No code fixes in this skill.
+</pre>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-rules" class="method-modal-toggle" />
+  <div class="method-modal method-modal-rules" role="dialog" aria-label="rules.md">
+    <label class="method-pop-backdrop" for="modal-rules" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head">
+        <h3>rules.md</h3>
+        <div class="skill-file-actions">
+          <a href="../rules.md" target="_blank" rel="noopener">Open file</a>
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-rules">Close</label>
+        </div>
+      </div>
+      <pre class="skill-file-body"># Technical AEO rules
+
+Evaluate **every** rule. Map Answerlint JSON/CSV findings into matching rules when attached. Group under the 10 checklist areas.
+
+Statuses: `pass` | `partial` | `fail` | `n/a` | `unknown`  
+Priorities: `High` | `Medium` | `Low`
+
+Primary free attachment: [Answerlint](https://www.npmjs.com/package/answerlint) (`answerlint audit` JSON/CSV; optional `answerlint llms lint`).
+
+---
+
+## 1. AI crawler access
+
+| ID | Priority | Rule |
+|----|----------|------|
+| B-01 | High | `robots.txt` exists in production / build output |
+| B-02 | High | Search/citation bots are not blanket-blocked (`OAI-SearchBot`, `PerplexityBot`, `Claude-SearchBot` / `ClaudeBot` as applicable) |
+| B-03 | Medium | Training vs search agents are considered deliberately (e.g. GPTBot vs OAI-SearchBot) — document intent if training is disallowed |
+| B-04 | Medium | Important content paths are not Disallow’d for AI search agents |
+| B-05 | Low | `Sitemap:` is declared in `robots.txt` (helps all crawlers, including AI) |
+
+**Answerlint / attachments:** crawler-access style checks if present; otherwise verify `robots.txt` in repo.
+
+## 2. Answer-shaped content
+
+| ID | Priority | Rule |
+|----|----------|------|
+| A-01 | High | Key pages lead with a direct, self-contained answer in the opening (BLUF / first paragraph) |
+| A-02 | High | Primary headings include natural-language questions users ask (where intent is informational) |
+| A-03 | Medium | FAQ or Q&amp;A blocks exist on pages that answer multiple related questions |
+| A-04 | Medium | Answers are concise enough to lift (roughly 40–80 words for the lead answer) without burying the point |
+| A-05 | Low | Soft marketing fluff does not precede the factual answer on money/docs pages |
+
+**Answerlint:** direct_answer, Q&amp;A density (and similar).
+
+## 3. Extractable structure
+
+| ID | Priority | Rule |
+|----|----------|------|
+| H-01 | High | One clear primary `h1` per page type |
+| H-02 | High | Heading hierarchy is logical (H1→H2→H3; no chaotic skips sitewide) |
+| H-03 | Medium | Passages are self-contained (quotable without missing antecedents) |
+| H-04 | Medium | Lists/tables used where comparisons or steps are clearer than prose |
+| H-05 | Low | Boilerplate repeated H2s do not drown topical headings |
+
+**Answerlint:** readability / extractability / structure-style checks.
+
+## 4. FAQ / HowTo schema
+
+| ID | Priority | Rule |
+|----|----------|------|
+| F-01 | High | If the page has visible FAQ/Q&amp;A: `FAQPage` JSON-LD present and valid — else `n/a` |
+| F-02 | Medium | If the page is a procedure: `HowTo` JSON-LD present when steps are shown — else `n/a` |
+| F-03 | Medium | Structured data matches visible Q&amp;A / steps (no hidden-only markup) |
+| F-04 | Low | Article/WebPage schema does not pretend to be FAQ when no Q&amp;A exists |
+
+**Answerlint:** faq_schema / HowTo-related checks. Prefer `n/a` over fail when intent is not Q&amp;A/howto.
+
+## 5. Entity &amp; brand clarity
+
+| ID | Priority | Rule |
+|----|----------|------|
+| N-01 | High | Brand / product / org name is clear and consistent on key templates |
+| N-02 | High | `Organization` and/or `WebSite` JSON-LD (or equivalent) present sitewide |
+| N-03 | Medium | Named entities in copy are explicit (expand acronyms on first use) |
+| N-04 | Medium | `Person` / author entity linked where authorship is claimed |
+| N-05 | Low | SameAs / official profile URLs present when brand has public profiles |
+
+**Answerlint:** named entities / entity clarity.
+
+## 6. E-E-A-T / trust signals
+
+| ID | Priority | Rule |
+|----|----------|------|
+| T-01 | High | Author byline (or org attribution) on article/docs templates |
+| T-02 | Medium | Author credentials / role visible or linked where expertise matters |
+| T-03 | Medium | About / contact (or equivalent trust pages) linked from global chrome |
+| T-04 | Medium | Claims that need proof are not anonymous (“studies show” without source) |
+| T-05 | Low | NAP / business identity consistent when local or company entity matters — else `n/a` |
+
+**Answerlint:** author byline / trust signals.
+
+## 7. Freshness
+
+| ID | Priority | Rule |
+|----|----------|------|
+| D-01 | High | Visible publish and/or updated date on time-sensitive content |
+| D-02 | Medium | `datePublished` / `dateModified` in schema when Article/BlogPosting (or similar) is used |
+| D-03 | Medium | Cornerstone pages show evidence of periodic refresh (not multi-year stale facts) |
+| D-04 | Low | Evergreen pages without dates are acceptable if intentionally timeless — document as `pass` with evidence |
+
+**Answerlint:** content freshness.
+
+## 8. Citation readiness
+
+| ID | Priority | Rule |
+|----|----------|------|
+| C-01 | High | Key claims include verifiable statistics, definitions, or concrete facts |
+| C-02 | High | Outbound citations / proof links to primary or reputable sources where claims need support |
+| C-03 | Medium | Quotable expert or source attributions appear where authority helps (without keyword stuffing) |
+| C-04 | Medium | Original data, examples, or first-hand detail present on flagship pages |
+| C-05 | Low | Citation style is consistent and link targets resolve |
+
+**Answerlint:** citation likelihood / external citations / evidence-quality style checks. Strongest research-backed content area (GEO: statistics, quotes, cite sources).
+
+## 9. Comparison &amp; decision content
+
+| ID | Priority | Rule |
+|----|----------|------|
+| V-01 | High | If page targets “best / vs / which” intent: clear criteria and comparison structure — else `n/a` |
+| V-02 | Medium | Comparison tables or explicit trade-offs present for decision pages — else `n/a` |
+| V-03 | Medium | Alternatives / competitors named fairly when the page is comparative — else `n/a` |
+| V-04 | Low | Decision pages state who the recommendation is for (audience fit) |
+
+**Answerlint:** comparison content. Prefer `n/a` on pure docs/blog that are not comparative.
+
+## 10. Attachments &amp; measurement
+
+Evaluate when Answerlint / prompt-pack / `llms lint` artifacts are attached; otherwise `unknown` or `n/a` as noted.
+
+| ID | Priority | Rule |
+|----|----------|------|
+| X-01 | High | If Answerlint JSON/CSV attached: fail/warn checks mapped into areas 1–9 (none left unexplained) |
+| X-02 | High | If Answerlint attached: composite / AEO / GEO scores recorded in Evidence for summary context |
+| X-03 | Medium | If `llms.txt` exists or was requested: `answerlint llms lint` (or equivalent) findings addressed — else `n/a` |
+| X-04 | Medium | Optional prompt-pack CSV: priority prompts show mention/citation status — else `unknown` if user wanted visibility proof, else `n/a` |
+| X-05 | Low | Answerlint diff / CI threshold regressions noted when before/after reports are attached |
+
+**Answerlint:** primary machine evidence (like Screaming Frog for SEO). Prompt packs are optional outcome evidence.
+
+---
+
+## Counts
+
+- Checklist areas 1–9: **42** rules (B–V)  
+- Attachment extras: **5** rules (X)  
+- **Total: 47 rules**
+
+Always evaluate all rows. Use `n/a` / `unknown` rather than skipping.
+</pre>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-B" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="1. AI crawler access">
+    <label class="method-pop-backdrop" for="modal-area-B" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>1. AI crawler access</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-B">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>If search and citation bots cannot fetch your pages, answer engines will not cite you—content quality never gets a chance.</p>
+        <h4>How to fix</h4>
+        <p>Ship a production robots.txt that does not blanket-block AI search agents (OAI-SearchBot, PerplexityBot, Claude-SearchBot/ClaudeBot as applicable). Document intentional training opt-outs (e.g. GPTBot) separately from search access, and declare Sitemap:.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-A" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="2. Answer-shaped content">
+    <label class="method-pop-backdrop" for="modal-area-A" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>2. Answer-shaped content</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-A">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Answer engines lift short, self-contained openings. Pages that bury the point under marketing fluff are harder to quote.</p>
+        <h4>How to fix</h4>
+        <p>Lead key pages with a direct answer (roughly 40–80 words), use question-shaped headings where intent is informational, and add FAQ blocks when multiple related questions are answered on-page.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-H" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="3. Extractable structure">
+    <label class="method-pop-backdrop" for="modal-area-H" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>3. Extractable structure</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-H">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Clean heading hierarchy and quotable passages make extraction reliable. Chaotic skips and vague pronouns reduce citability.</p>
+        <h4>How to fix</h4>
+        <p>Use one H1 per page type, keep H1→H2→H3 order sensible, write self-contained passages, and prefer lists/tables for steps and comparisons.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-F" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="4. FAQ / HowTo schema">
+    <label class="method-pop-backdrop" for="modal-area-F" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>4. FAQ / HowTo schema</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-F">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>FAQPage and HowTo JSON-LD help machines identify answer-eligible blocks when they match visible content. Skip when the page is not Q&A-shaped.</p>
+        <h4>How to fix</h4>
+        <p>When FAQ/Q&A is visible, add valid FAQPage JSON-LD that mirrors on-page pairs. Add HowTo only for real step procedures. Prefer n/a over fail when intent does not match.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-N" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="5. Entity & brand clarity">
+    <label class="method-pop-backdrop" for="modal-area-N" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>5. Entity & brand clarity</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-N">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Models need a clear “who” to attribute. Ambiguous brand/product naming and missing Organization markup weaken citations.</p>
+        <h4>How to fix</h4>
+        <p>Keep brand naming consistent, ship Organization/WebSite JSON-LD, expand acronyms on first use, and link Person entities where authorship is claimed.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-T" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="6. E-E-A-T / trust signals">
+    <label class="method-pop-backdrop" for="modal-area-T" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>6. E-E-A-T / trust signals</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-T">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Answer engines prefer sources that look accountable—named authors, credentials, and verifiable claims.</p>
+        <h4>How to fix</h4>
+        <p>Show author or org attribution on article/docs templates, link About/Contact, and avoid unsourced authority claims.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-D" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="7. Freshness">
+    <label class="method-pop-backdrop" for="modal-area-D" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>7. Freshness</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-D">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Recency is a common citation signal for changing topics. Stale cornerstone pages lose share of voice over time.</p>
+        <h4>How to fix</h4>
+        <p>Show publish/updated dates on time-sensitive content, set datePublished/dateModified in Article schema when used, and refresh flagship pages periodically.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-C" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="8. Citation readiness">
+    <label class="method-pop-backdrop" for="modal-area-C" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>8. Citation readiness</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-C">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Research (GEO / Aggarwal et al.) finds statistics, quotations, and cite-sources style content lift visibility in generative answers.</p>
+        <h4>How to fix</h4>
+        <p>Add verifiable facts and outbound proof links, include quotable attributions where helpful, and ship original examples or data on flagship pages—avoid keyword stuffing.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-V" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="9. Comparison & decision content">
+    <label class="method-pop-backdrop" for="modal-area-V" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>9. Comparison & decision content</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-V">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>“Best / vs / which” prompts need criteria and trade-offs. Pure docs pages can mark this area n/a.</p>
+        <h4>How to fix</h4>
+        <p>For comparative intent: state criteria, use tables or explicit trade-offs, name alternatives fairly, and clarify audience fit. Otherwise score n/a.</p>
+      </div>
+    </div>
+  </div>
+  <input type="checkbox" id="modal-area-X" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="10. Attachments & measurement">
+    <label class="method-pop-backdrop" for="modal-area-X" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>10. Attachments & measurement</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-X">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Answerlint JSON/CSV (and optional llms lint / prompt packs) are independent evidence—like Screaming Frog for SEO. Unmapped attachment fails leave measured gaps unexplained.</p>
+        <h4>How to fix</h4>
+        <p>When Answerlint is attached, map fail/warn checks into areas 1–9 and record scores in Evidence. Handle llms lint and prompt-pack results when provided; otherwise use unknown or n/a as noted in rules.md.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1>Technical AEO Audit</h1>
+        </div>
+      </div>
+      <dl class="meta-grid">
+        <div class="meta-item">
+          <dt>Date</dt>
+          <dd>2026-07-27 06:56 (CEST)</dd>
+        </div>
+        <div class="meta-item">
+          <dt>Commit</dt>
+          <dd><a class="commit-link" href="https://github.com/example/site/commit/a1b2c3d4e5f67890" target="_blank" rel="noopener">a1b2c3d</a></dd>
+        </div>
+      </dl>
+      <div class="method">
+        <div class="method-line">A <span>handoff.md</span> (mock — not generated) was generated so agents can fix the failed and partial issues.</div>
+        <!-- Keep this sentence on ONE line in the generated HTML (labels only — no block tags). -->
+        <div class="method-line">This report was generated based on analysis performed by Cursor (Composer) using the <label class="method-link" for="modal-skill">skill</label> and <label class="method-link" for="modal-rules">rules</label> over static site files, and the following attachments:</div>
+        <ul class="attachment-list">
+          <!-- If none: <li class="none">None provided.</li> -->
+          <li class="none">None provided.</li>
+        </ul>
+      </div>
+    </header>
+
+    <section class="card summary">
+      <h2>Summary</h2>
+      <div class="summary-hero">
+        <div class="pass-rate score-average">
+          <div class="score-gauge" role="img" aria-label="Pass rate 65 percent">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="score-track" cx="60" cy="60" r="52" pathLength="100" />
+              <circle class="score-fill" cx="60" cy="60" r="52" pathLength="100"
+                stroke-dasharray="65 100" />
+            </svg>
+            <div class="score-center">
+              <span class="pass-rate-value">65%</span>
+            </div>
+          </div>
+          <div class="pass-rate-label">
+            <span class="pass-rate-fraction">34 succ. / 52 total</span>
+            <span class="pass-rate-pct">65% pass rate</span>
+          </div>
+        </div>
+        <div class="stat-tiles">
+          <a class="stat-tile stat-fail" href="#prio-high-fail" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">7</span>
+            <span class="stat-label">Failed</span>
+          </a>
+          <a class="stat-tile stat-partial" href="#prio-high-partial" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">9</span>
+            <span class="stat-label">Partial</span>
+          </a>
+          <a class="stat-tile stat-pass" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">34</span>
+            <span class="stat-label">Passed</span>
+          </a>
+          <a class="stat-tile stat-unknown" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">2</span>
+            <span class="stat-label">Unknown</span>
+          </a>
+          <a class="stat-tile stat-na" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">5</span>
+            <span class="stat-label">N/A</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="view-switch">
+      <input type="radio" name="audit-view" id="view-tab-priority" checked />
+      <input type="radio" name="audit-view" id="view-tab-rule" />
+      <div class="summary-tablist" role="tablist" aria-label="Issue sorting">
+        <label class="summary-tab" for="view-tab-priority" role="tab">By priority</label>
+        <label class="summary-tab" for="view-tab-rule" role="tab">By rule</label>
+      </div>
+
+      <div class="view-panel view-panel-priority">
+        <section class="card overview">
+          <h2>Overview</h2>
+          <table class="priority-summary">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Failed</th>
+                <th>Partial</th>
+                <th>Passed</th>
+                <th>Unknown</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>High</td>
+                <td><a class="count count-fail" href="#prio-high-fail">4</a></td>
+                <td><a class="count count-partial" href="#prio-high-partial">2</a></td>
+                <td><a class="count count-pass" href="#prio-passed">12</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td>Medium</td>
+                <td><a class="count count-fail" href="#prio-medium-fail">2</a></td>
+                <td><a class="count count-partial" href="#prio-medium-partial">5</a></td>
+                <td><a class="count count-pass" href="#prio-passed">14</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">1</a></td>
+                <td><a class="count count-na" href="#prio-passed">2</a></td>
+              </tr>
+              <tr>
+                <td>Low</td>
+                <td><a class="count count-fail" href="#prio-low-fail">1</a></td>
+                <td><a class="count count-partial" href="#prio-low-partial">2</a></td>
+                <td><a class="count count-pass" href="#prio-passed">8</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-na" href="#prio-passed">3</a></td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td><a class="count count-fail" href="#prio-high-fail">7</a></td>
+                <td><a class="count count-partial" href="#prio-high-partial">9</a></td>
+                <td><a class="count count-pass" href="#prio-passed">34</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">2</a></td>
+                <td><a class="count count-na" href="#prio-passed">5</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        
+<div id="prio-high-fail" class="result-group">
+  <p class="section-label">High — Failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">B-02</span>
+    <span class="rule-title">Search/citation bots are not blanket-blocked</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Blocked search bots opt you out of AI citations.</p>
+    <h4>Evidence</h4>
+    <p>robots.txt Disallow: / for OAI-SearchBot.</p>
+    <h4>How to fix</h4>
+    <p>Allow OAI-SearchBot (and peers); keep GPTBot policy explicit if needed.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">A-01</span>
+    <span class="rule-title">Key pages lead with a direct answer</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Engines lift openings.</p>
+    <h4>Evidence</h4>
+    <p>Homepage hero is slogan-only; no BLUF paragraph.</p>
+    <h4>How to fix</h4>
+    <p>Add a 40–80 word direct answer under the H1.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">C-01</span>
+    <span class="rule-title">Key claims include verifiable statistics</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>GEO methods favor fact density.</p>
+    <h4>Evidence</h4>
+    <p>Pricing page claims “industry-leading” with no numbers.</p>
+    <h4>How to fix</h4>
+    <p>Add concrete metrics with sources.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">H-01</span>
+    <span class="rule-title">One clear primary h1 per page type</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Multiple H1s confuse extractors.</p>
+    <h4>Evidence</h4>
+    <p>Docs layout renders site name + page title as two H1s.</p>
+    <h4>How to fix</h4>
+    <p>Keep a single page H1.</p>
+  </div>
+</details>
+</div>
+<div id="prio-high-partial" class="result-group">
+  <p class="section-label">High — Partially failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">A-02</span>
+    <span class="rule-title">Primary headings include natural-language questions</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Question headings improve match to prompts.</p>
+    <h4>Evidence</h4>
+    <p>Blog uses topic titles only.</p>
+    <h4>How to fix</h4>
+    <p>Convert key H2s to question form where intent is informational.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">N-02</span>
+    <span class="rule-title">Organization and/or WebSite JSON-LD present</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Entity clarity for attribution.</p>
+    <h4>Evidence</h4>
+    <p>WebSite JSON-LD present; Organization incomplete.</p>
+    <h4>How to fix</h4>
+    <p>Complete Organization name, url, logo.</p>
+  </div>
+</details>
+</div>
+<div id="prio-medium-fail" class="result-group">
+  <p class="section-label">Medium — Failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">X-01</span>
+    <span class="rule-title">Answerlint fail/warn checks mapped</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Unmapped attachment findings.</p>
+    <h4>Evidence</h4>
+    <p>Mock Answerlint: direct_answer fail on /features.</p>
+    <h4>How to fix</h4>
+    <p>Map into A-01 with evidence.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">C-02</span>
+    <span class="rule-title">Outbound citations / proof links</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Unsourced claims.</p>
+    <h4>Evidence</h4>
+    <p>Three “research shows” sentences without links.</p>
+    <h4>How to fix</h4>
+    <p>Cite primary sources.</p>
+  </div>
+</details>
+</div>
+<div id="prio-medium-partial" class="result-group">
+  <p class="section-label">Medium — Partially failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">T-01</span>
+    <span class="rule-title">Author byline on article/docs templates</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Trust/attribution.</p>
+    <h4>Evidence</h4>
+    <p>Docs have bylines; blog posts do not.</p>
+    <h4>How to fix</h4>
+    <p>Add author field to blog templates.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">D-02</span>
+    <span class="rule-title">datePublished / dateModified in schema</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Freshness for Article types.</p>
+    <h4>Evidence</h4>
+    <p>Article schema missing dateModified.</p>
+    <h4>How to fix</h4>
+    <p>Set dateModified on updates.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">F-01</span>
+    <span class="rule-title">FAQPage JSON-LD when FAQ visible</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>FAQ on /support lacks schema.</p>
+    <h4>Evidence</h4>
+    <p>Visible FAQ; no FAQPage JSON-LD.</p>
+    <h4>How to fix</h4>
+    <p>Add matching FAQPage markup.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">H-03</span>
+    <span class="rule-title">Passages are self-contained</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Pronoun-heavy paragraphs.</p>
+    <h4>Evidence</h4>
+    <p>Several “This makes it faster” without referent.</p>
+    <h4>How to fix</h4>
+    <p>Rewrite for standalone quotability.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">V-01</span>
+    <span class="rule-title">Comparison structure for best/vs intent</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>/compare is criteria-light.</p>
+    <h4>Evidence</h4>
+    <p>Only prose praise; no table.</p>
+    <h4>How to fix</h4>
+    <p>Add criteria table or n/a if not comparative.</p>
+  </div>
+</details>
+</div>
+<div id="prio-low-fail" class="result-group">
+  <p class="section-label">Low — Failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">A-05</span>
+    <span class="rule-title">Soft marketing fluff does not precede the factual answer</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Fluff delays the answer.</p>
+    <h4>Evidence</h4>
+    <p>Features page opens with three slogan lines.</p>
+    <h4>How to fix</h4>
+    <p>Move facts above slogans.</p>
+  </div>
+</details>
+</div>
+<div id="prio-low-partial" class="result-group">
+  <p class="section-label">Low — Partially failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">T-03</span>
+    <span class="rule-title">About / contact linked from global chrome</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Footer Contact only; About missing.</p>
+    <h4>Evidence</h4>
+    <p>No About in nav/footer.</p>
+    <h4>How to fix</h4>
+    <p>Link About from footer.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">X-03</span>
+    <span class="rule-title">llms.txt lint findings addressed</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>llms.txt present but thin.</p>
+    <h4>Evidence</h4>
+    <p>Mock llms lint: missing docs section.</p>
+    <h4>How to fix</h4>
+    <p>Expand llms.txt sections or n/a if not required.</p>
+  </div>
+</details>
+</div>
+<details id="prio-passed" class="passed-block">
+  <summary class="group">Passed, N/A &amp; unknown (34 passed · 2 unknown · 5 N/A)</summary>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">B-01</span>
+    <span class="rule-title">robots.txt exists</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Present.</p>
+    <h4>Evidence</h4>
+    <p>public/robots.txt</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">N-01</span>
+    <span class="rule-title">Brand name clear and consistent</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK.</p>
+    <h4>Evidence</h4>
+    <p>Same brand string sitewide.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-unknown">unknown</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">X-02</span>
+    <span class="rule-title">Answerlint scores recorded</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>No live Answerlint file in mock attachments list.</p>
+    <h4>Evidence</h4>
+    <p>unknown for demo</p>
+    <h4>How to fix</h4>
+    <p>Attach answerlint-report.json on a real run.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-na">na</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">V-02</span>
+    <span class="rule-title">Comparison tables on decision pages</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Most pages not comparative.</p>
+    <h4>Evidence</h4>
+    <p>n/a</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+</details>
+
+      </div>
+
+      <div class="view-panel view-panel-rule">
+        <section class="card overview">
+          <h2>Overview</h2>
+          <!--
+            Fixed order from rules.md (1–10): B A H F N T D C V X.
+            Rule area names open hardcoded Why / How to fix dialogs (modal-area-*).
+            Count cells link to #area-B … #area-X.
+          -->
+          <table class="priority-summary rule-summary">
+            <thead>
+              <tr>
+                <th>Rule area</th>
+                <th>Failed</th>
+                <th>Partial</th>
+                <th>Passed</th>
+                <th>Unknown</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="area-num">1.</span> <label class="method-link" for="modal-area-B">AI crawler access</label></td>
+                <td><a class="count count-fail" href="#area-B">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-pass" href="#area-B">4</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">2.</span> <label class="method-link" for="modal-area-A">Answer-shaped content</label></td>
+                <td><a class="count count-fail" href="#area-A">1</a></td>
+                <td><a class="count count-partial" href="#area-A">1</a></td>
+                <td><a class="count count-pass" href="#area-A">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">3.</span> <label class="method-link" for="modal-area-H">Extractable structure</label></td>
+                <td><a class="count count-fail" href="#area-H">1</a></td>
+                <td><a class="count count-partial" href="#area-H">1</a></td>
+                <td><a class="count count-pass" href="#area-H">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">4.</span> <label class="method-link" for="modal-area-F">FAQ / HowTo schema</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-partial" href="#area-F">1</a></td>
+                <td><a class="count count-pass" href="#area-F">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-na" href="#area-F">2</a></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">5.</span> <label class="method-link" for="modal-area-N">Entity & brand clarity</label></td>
+                <td><a class="count count-fail" href="#area-N">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-pass" href="#area-N">4</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">6.</span> <label class="method-link" for="modal-area-T">E-E-A-T / trust signals</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-partial" href="#area-T">2</a></td>
+                <td><a class="count count-pass" href="#area-T">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">7.</span> <label class="method-link" for="modal-area-D">Freshness</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-partial" href="#area-D">1</a></td>
+                <td><a class="count count-pass" href="#area-D">3</a></td>
+                <td><a class="count count-unknown" href="#area-D">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">8.</span> <label class="method-link" for="modal-area-C">Citation readiness</label></td>
+                <td><a class="count count-fail" href="#area-C">1</a></td>
+                <td><a class="count count-partial" href="#area-C">1</a></td>
+                <td><a class="count count-pass" href="#area-C">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">9.</span> <label class="method-link" for="modal-area-V">Comparison & decision content</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-partial" href="#area-V">1</a></td>
+                <td><a class="count count-pass" href="#area-V">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-na" href="#area-V">3</a></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">10.</span> <label class="method-link" for="modal-area-X">Attachments & measurement</label></td>
+                <td><a class="count count-fail" href="#area-X">2</a></td>
+                <td><a class="count count-partial" href="#area-X">1</a></td>
+                <td><a class="count count-pass" href="#area-X">9</a></td>
+                <td><a class="count count-unknown" href="#area-X">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td><a class="count count-fail" href="#area-B">7</a></td>
+                <td><a class="count count-partial" href="#area-B">9</a></td>
+                <td><a class="count count-pass" href="#area-B">34</a></td>
+                <td><a class="count count-unknown" href="#area-B">2</a></td>
+                <td><a class="count count-na" href="#area-B">5</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!--
+          Rule issue list: one .area-group per area in fixed order.
+          Anchors: #area-B #area-A … #area-X
+        -->
+        
+<div id="area-B" class="result-group area-group">
+  <p class="section-label">1. AI crawler access</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">B-02</span>
+    <span class="rule-title">Search/citation bots are not blanket-blocked</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Blocked bots.</p>
+    <h4>Evidence</h4>
+    <p>OAI-SearchBot Disallow.</p>
+    <h4>How to fix</h4>
+    <p>Allow search bots.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (4 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">B-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-A" class="result-group area-group">
+  <p class="section-label">2. Answer-shaped content</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">A-01</span>
+    <span class="rule-title">Key pages lead with a direct answer</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>No BLUF.</p>
+    <h4>Evidence</h4>
+    <p>Homepage slogan-only.</p>
+    <h4>How to fix</h4>
+    <p>Add direct answer.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">A-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-H" class="result-group area-group">
+  <p class="section-label">3. Extractable structure</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">H-01</span>
+    <span class="rule-title">One clear primary h1</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Two H1s.</p>
+    <h4>Evidence</h4>
+    <p>Docs layout.</p>
+    <h4>How to fix</h4>
+    <p>Single H1.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">H-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-F" class="result-group area-group">
+  <p class="section-label">4. FAQ / HowTo schema</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">F-01</span>
+    <span class="rule-title">FAQPage when FAQ visible</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Missing schema.</p>
+    <h4>Evidence</h4>
+    <p>/support FAQ.</p>
+    <h4>How to fix</h4>
+    <p>Add FAQPage.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (1 passed · 0 unknown · 2 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">F-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-N" class="result-group area-group">
+  <p class="section-label">5. Entity & brand clarity</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">N-02</span>
+    <span class="rule-title">Organization JSON-LD complete</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Incomplete.</p>
+    <h4>Evidence</h4>
+    <p>Missing logo.</p>
+    <h4>How to fix</h4>
+    <p>Complete Organization.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (4 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">N-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-T" class="result-group area-group">
+  <p class="section-label">6. E-E-A-T / trust signals</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">T-01</span>
+    <span class="rule-title">Author byline</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Blog missing.</p>
+    <h4>Evidence</h4>
+    <p>Docs OK.</p>
+    <h4>How to fix</h4>
+    <p>Add blog bylines.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">T-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-D" class="result-group area-group">
+  <p class="section-label">7. Freshness</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">D-02</span>
+    <span class="rule-title">dateModified in schema</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Missing.</p>
+    <h4>Evidence</h4>
+    <p>Article schema.</p>
+    <h4>How to fix</h4>
+    <p>Set dateModified.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 1 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">D-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-C" class="result-group area-group">
+  <p class="section-label">8. Citation readiness</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">C-01</span>
+    <span class="rule-title">Verifiable statistics</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>No numbers.</p>
+    <h4>Evidence</h4>
+    <p>Pricing claims.</p>
+    <h4>How to fix</h4>
+    <p>Add metrics + sources.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">C-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-V" class="result-group area-group">
+  <p class="section-label">9. Comparison & decision content</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">V-01</span>
+    <span class="rule-title">Comparison structure</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Weak criteria.</p>
+    <h4>Evidence</h4>
+    <p>/compare.</p>
+    <h4>How to fix</h4>
+    <p>Add table.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (1 passed · 0 unknown · 3 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">V-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-X" class="result-group area-group">
+  <p class="section-label">10. Attachments & measurement</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">X-01</span>
+    <span class="rule-title">Answerlint checks mapped</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Unmapped.</p>
+    <h4>Evidence</h4>
+    <p>direct_answer fail.</p>
+    <h4>How to fix</h4>
+    <p>Map to A-01.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (9 passed · 1 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">X-OK</span>
+    <span class="rule-title">Sample passed check</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK for mock.</p>
+    <h4>Evidence</h4>
+    <p>Mock evidence.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+      </div>
+    </div>
+
+  </div>
+  <script>
+    (function () {
+      function applyOverviewRowColors() {
+        document.querySelectorAll("table.priority-summary tbody tr").forEach(function (tr) {
+          var cells = tr.querySelectorAll("td");
+          if (cells.length < 3) return;
+          var fail = parseInt((cells[1].textContent || "0").replace(/\s+/g, ""), 10);
+          var partial = parseInt((cells[2].textContent || "0").replace(/\s+/g, ""), 10);
+          if (isNaN(fail)) fail = 0;
+          if (isNaN(partial)) partial = 0;
+          tr.classList.remove("row-fail", "row-partial", "row-pass");
+          if (fail > 0) tr.classList.add("row-fail");
+          else if (partial > 0) tr.classList.add("row-partial");
+          else tr.classList.add("row-pass");
+        });
+      }
+      applyOverviewRowColors();
+
+      /* Open/close modals without focusing the checkbox (avoids scroll-to-top). */
+      document.addEventListener("click", function (e) {
+        var label = e.target.closest("label[for]");
+        if (!label) return;
+        var input = document.getElementById(label.getAttribute("for"));
+        if (!input || !input.classList.contains("method-modal-toggle")) return;
+        e.preventDefault();
+        var closes = label.classList.contains("method-pop-close") || label.classList.contains("method-pop-backdrop");
+        input.checked = !closes;
+      });
+
+      document.querySelectorAll(".method-pop-copy").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var panel = btn.closest(".method-pop-panel");
+          if (!panel) return;
+          var body = panel.querySelector(".skill-file-body, .area-guide-body");
+          if (!body) return;
+          var text = body.tagName === "PRE" ? body.textContent : body.innerText;
+          function done() {
+            var prev = btn.textContent;
+            btn.textContent = "Copied";
+            btn.classList.add("is-copied");
+            setTimeout(function () {
+              btn.textContent = prev;
+              btn.classList.remove("is-copied");
+            }, 1500);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(function () {
+              fallbackCopy(text, done);
+            });
+          } else {
+            fallbackCopy(text, done);
+          }
+        });
+      });
+
+      function fallbackCopy(text, done) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (err) {}
+        document.body.removeChild(ta);
+        done();
+      }
+    })();
+  </script>
+</body>
+</html>
