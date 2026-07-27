@@ -32,8 +32,7 @@ Create (never reuse a folder name — each run gets its own directory):
 
 ```text
 audit/YYYY-MM-DD-HHmm/
-  index.html              # Main report (open this)
-  report.css              # Copied from this skill’s template CSS
+  index.html              # Main report (open this) — self-contained (CSS inlined)
   meta.json               # Machine-readable summary
   handoff.md              # For technical-seo-implement
   skill-sources/
@@ -63,7 +62,7 @@ audit/YYYY-MM-DD-HHmm/
 4. Record `model` (Cursor model name) and `analysisScope` (`static site files` / `a live URL` / `static site files and a live URL`).
 5. Parse SF Issues CSV if present; map rows into rules (see [rules.md](rules.md)).
 6. Evaluate **every rule** in [rules.md](rules.md) (≥60) against the codebase (+ attachments). Status: `pass` | `partial` | `fail` | `n/a` | `unknown`.
-7. Build `index.html` from [report-template.html](report-template.html) + [report.css](report.css). Keep visual structure identical across runs.
+7. Build `index.html` from [report-template.html](report-template.html). Keep the inlined `<style>` block and visual structure identical across runs. Do **not** emit a separate `report.css`.
 8. Write `meta.json` and `handoff.md`.
 9. Stop. Tell the user the path to `index.html`. Do not implement.
 
@@ -108,19 +107,24 @@ audit/YYYY-MM-DD-HHmm/
 6. **Overview card** — table for the active tab:
    - **By priority** — High / Medium / Low / Total; count links scroll to `#prio-…` sections
    - **By rule** — 15 checklist areas in fixed `rules.md` order (+ Attachment-driven / SF extras); count links scroll to `#area-T` … `#area-X`
+   - **Row colors** — each tbody row (including Total) gets a status background via the template script: **red** if Failed &gt; 0, **yellow** if Failed = 0 and Partial &gt; 0, else **green**. Do not remove the footer `<script>` that applies `row-fail` / `row-partial` / `row-pass`.
+   - **Count cells** — replace each `{{H_FAIL}}`, `{{AREA_T_FAIL}}`, `{{COUNT_FAIL_CELL}}`, etc. with a full cell value: either `<a class="count count-…" href="…">N</a>` or `<span class="count count-zero">0</span>` (never a bare number).
+   - **By rule names** — keep the hardcoded `<label class="method-link" for="modal-area-…">` controls and the matching area-guide modals (Why it matters / How to fix). Do not replace area names with plain text or strip those modals.
 7. **Issue list** (sorted to match the active tab; all rules **collapsed by default**):
    - Priority view: `#prio-high-fail` → … → `#prio-passed`
    - Rule view: `#area-T` … `#area-B` → `#area-X`. Each area is an `.area-group` card; fail/partial rules and the nested “Passed, N/A & unknown” toggle sit inside `.area-body` (indented with a dotted vertical rail) so they read as children of the area title.
 8. Each rule is a **`<details>` collapse**:
    - Summary line: status badge + priority badge + rule-id badge + short title (same row)
    - Body: **Why it matters**, **Evidence**, **How to fix**, optional **SF / PSI refs** — expanded body uses a distinct background
-9. **Method pops** — **skill** / **rules** are inline `<label>`s (never `<details>` in the sentence) that open checkbox-driven modals with Close + backdrop. Keep the first method sentence as a **single HTML line**.
+9. **Method / area pops** — **skill** / **rules** and By-rule **area names** are inline `<label>`s (never `<details>` in the sentence) that open checkbox-driven modals with Copy + Close + backdrop. Keep the first method sentence as a **single HTML line**. Area guides are static (hardcoded in the template); skill/rules modals embed verbatim content via `{{EMBED_SKILL_MD}}` / `{{EMBED_RULES_MD}}`.
 
 Zero counts: use `<span class="count count-zero">0</span>` or `stat-tile is-zero` — not a link.
 
-Use only [report.css](report.css) classes from the template — unified design across audits.
+Use only the CSS classes already defined in the template’s inlined `<style>` block — unified design across audits. Keep styles embedded in `index.html` so the report renders correctly when opened alone (without `attachments/` or other sibling files).
 
-When filling `{{SKILL_MD}}` / `{{RULES_MD}}`, HTML-escape the full file text into the modal `<pre>` blocks. Also copy the files to `skill-sources/SKILL.md` and `skill-sources/rules.md`. Store `skillName`, `model`, `analysisScope`, and `byArea` in `meta.json`.
+When filling `{{EMBED_SKILL_MD}}` / `{{EMBED_RULES_MD}}`, HTML-escape the full file text into the modal `<pre class="skill-file-body">` blocks (replace those exact placeholders only — do not globally replace bare `{{SKILL_MD}}` / `{{RULES_MD}}` strings that may appear inside the skill docs). Also copy the files to `skill-sources/SKILL.md` and `skill-sources/rules.md`. Store `skillName`, `model`, `analysisScope`, and `byArea` in `meta.json`.
+
+Each modal header includes **Copy** (clipboard) and **Close**. Keep those controls; do not remove the footer script that colors overview rows, opens modals without scrolling, and handles Copy.
 
 ## Scoring (headline)
 

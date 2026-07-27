@@ -4,13 +4,875 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Technical SEO Audit — {{DATE}}</title>
-  <link rel="stylesheet" href="report.css" />
+  <style>
+/* Technical SEO audit report — keep stable across runs */
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #5c5c5c;
+  --line: #e2e0d8;
+  --fail: #b42318;
+  --fail-bg: #fef3f2;
+  --partial: #b54708;
+  --partial-bg: #fffaeb;
+  --pass: #027a48;
+  --pass-bg: #ecfdf3;
+  --unknown: #344054;
+  --unknown-bg: #f2f4f7;
+  --na: #667085;
+  --na-bg: #f9fafb;
+  --high: #b42318;
+  --medium: #b54708;
+  --low: #175cd3;
+  --radius: 10px;
+  --font: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+a { color: #175cd3; }
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.header {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  letter-spacing: -0.02em;
+}
+
+.header .sub {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.method {
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+
+.method-line {
+  margin: 0 0 0.45rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.method-line + .attachment-list {
+  margin-top: 0.3rem;
+}
+
+.method-line a,
+.method-link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.method-line a:hover,
+.method-link:hover { color: #175cd3; }
+
+.method-modal-toggle {
+  /* fixed so focusing the checkbox does not scroll the page to top */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.method-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Each toggle is immediately followed by its modal panel */
+.method-modal-toggle:checked + .method-modal {
+  display: flex;
+}
+
+.method-pop-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.42);
+  cursor: pointer;
+}
+
+.method-pop-panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 94vw);
+  max-height: min(80vh, 820px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 48px rgba(26, 26, 26, 0.22);
+}
+
+.method-pop-panel .skill-file-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.method-pop-panel .skill-file-head h3 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.skill-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+
+.skill-file-actions a {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skill-file-actions a:hover { text-decoration: underline; }
+
+.method-pop-close {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.method-pop-close:hover {
+  border-color: #175cd3;
+  color: #175cd3;
+}
+
+.method-pop-copy {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.method-pop-copy:hover {
+  border-color: #175cd3;
+  color: #175cd3;
+}
+
+.method-pop-copy.is-copied {
+  border-color: var(--pass);
+  color: var(--pass);
+}
+
+.method-pop-panel .area-guide-body {
+  margin: 0;
+  padding: 0.85rem 1rem 1.1rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.method-pop-panel .area-guide-body h4 {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.method-pop-panel .area-guide-body h4:first-child {
+  margin-top: 0;
+}
+
+.method-pop-panel .area-guide-body p {
+  margin: 0 0 0.55rem;
+}
+
+.method-pop-panel .area-guide-body p:last-child {
+  margin-bottom: 0;
+}
+
+.method-pop-panel .skill-file-head.area-guide-head h3 {
+  font-family: var(--font);
+  font-size: 0.95rem;
+}
+
+.method-pop-panel .skill-file-body {
+  margin: 0;
+  padding: 0.85rem 0.95rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg);
+}
+
+.attachment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.attachment-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.attachment-list a:hover { border-color: #175cd3; color: #175cd3; }
+
+.attachment-list .none {
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.meta-item dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.meta-item dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.meta-item dd a.commit-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.meta-item dd a.commit-link:hover {
+  color: #175cd3;
+}
+
+.card,
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.card h2,
+.summary h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.overview h2 {
+  margin-bottom: 0.85rem;
+}
+
+.view-switch {
+  margin-bottom: 1.25rem;
+}
+
+.view-switch > input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.summary-tablist {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.summary-tab {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  user-select: none;
+}
+
+.summary-tab:hover { color: var(--ink); }
+
+#view-tab-priority:checked ~ .summary-tablist label[for="view-tab-priority"],
+#view-tab-rule:checked ~ .summary-tablist label[for="view-tab-rule"] {
+  color: var(--ink);
+  background: var(--bg);
+  border-color: var(--line);
+}
+
+.view-panel { display: none; }
+
+#view-tab-priority:checked ~ .view-panel-priority,
+#view-tab-rule:checked ~ .view-panel-rule {
+  display: block;
+}
+
+table.rule-summary td:first-child {
+  font-weight: 600;
+}
+
+table.rule-summary .area-num {
+  display: inline-block;
+  min-width: 1.35rem;
+  margin-right: 0.35rem;
+  color: var(--muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-hero {
+  display: grid;
+  grid-template-columns: minmax(140px, 170px) 1fr;
+  gap: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .summary-hero { grid-template-columns: 1fr; }
+}
+
+.pass-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.25rem;
+}
+
+.score-gauge {
+  position: relative;
+  width: 124px;
+  height: 124px;
+}
+
+.score-gauge svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.score-track,
+.score-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.score-track {
+  stroke: #e8e8e8;
+}
+
+.score-fill {
+  stroke: var(--score-color, var(--pass));
+  transition: stroke-dasharray 0.4s ease;
+}
+
+.score-poor { --score-color: #ff4e42; }
+.score-average { --score-color: #ffa400; }
+.score-good { --score-color: #0cce6b; }
+
+.score-poor .score-track { stroke: #ffdad6; }
+.score-average .score-track { stroke: #ffe6b8; }
+.score-good .score-track { stroke: #c9f0d8; }
+
+.score-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pass-rate-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--score-color, var(--pass));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pass-rate-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.pass-rate-fraction {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pass-rate-pct {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  .stat-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 420px) {
+  .stat-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.75rem 0.7rem;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  cursor: pointer;
+}
+
+.stat-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(26, 26, 26, 0.08);
+}
+
+.stat-tile.is-zero {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.stat-num {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-fail { background: var(--fail-bg); border-color: #fecdca; }
+.stat-fail .stat-num,
+.stat-fail .stat-label { color: var(--fail); }
+
+.stat-partial { background: var(--partial-bg); border-color: #fedf89; }
+.stat-partial .stat-num,
+.stat-partial .stat-label { color: var(--partial); }
+
+.stat-pass { background: var(--pass-bg); border-color: #abefc6; }
+.stat-pass .stat-num,
+.stat-pass .stat-label { color: var(--pass); }
+
+.stat-unknown { background: var(--unknown-bg); border-color: #d0d5dd; }
+.stat-unknown .stat-num,
+.stat-unknown .stat-label { color: var(--unknown); }
+
+.stat-na { background: var(--na-bg); border-color: #d0d5dd; }
+.stat-na .stat-num,
+.stat-na .stat-label { color: var(--na); }
+
+table.priority-summary {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+table.priority-summary th,
+table.priority-summary td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+table.priority-summary th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+table.priority-summary td:not(:first-child) {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+table.priority-summary th:not(:first-child) {
+  text-align: right;
+}
+
+table.priority-summary .total-row td {
+  border-bottom: none;
+  border-top: 2px solid var(--ink);
+  font-weight: 700;
+  padding-top: 0.7rem;
+}
+
+/* Overview row status (fail > partial > pass); applies to priority, rule, and Total */
+table.priority-summary tbody tr.row-fail td {
+  background: var(--fail-bg);
+}
+
+table.priority-summary tbody tr.row-partial td {
+  background: var(--partial-bg);
+}
+
+table.priority-summary tbody tr.row-pass td {
+  background: var(--pass-bg);
+}
+
+table.priority-summary tbody tr.row-fail td:first-child,
+table.priority-summary tbody tr.row-partial td:first-child,
+table.priority-summary tbody tr.row-pass td:first-child {
+  box-shadow: inset 3px 0 0 currentColor;
+}
+
+table.priority-summary tbody tr.row-fail td:first-child { color: var(--fail); }
+table.priority-summary tbody tr.row-partial td:first-child { color: var(--partial); }
+table.priority-summary tbody tr.row-pass td:first-child { color: var(--pass); }
+
+table.rule-summary .method-link {
+  font-weight: 600;
+}
+
+.count {
+  display: inline-block;
+  min-width: 1.5rem;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-decoration: none;
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  transition: background 0.12s ease;
+}
+
+.count:hover { filter: brightness(0.92); }
+
+.count-fail { color: var(--fail); background: var(--fail-bg); }
+.count-partial { color: var(--partial); background: var(--partial-bg); }
+.count-pass { color: var(--pass); background: var(--pass-bg); }
+.count-unknown { color: var(--unknown); background: var(--unknown-bg); }
+.count-na { color: var(--na); background: var(--na-bg); }
+
+.count-zero {
+  color: var(--muted);
+  background: transparent;
+  font-weight: 600;
+  cursor: default;
+  pointer-events: none;
+}
+
+.result-group {
+  scroll-margin-top: 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.section-label {
+  margin: 1.5rem 0 0.65rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* By-rule area cards: title is parent; issues nest under a dotted rail */
+.area-group {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem 1rem;
+  margin-bottom: 0.85rem;
+  scroll-margin-top: 1.25rem;
+}
+
+.area-group > .section-label {
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.area-body {
+  margin-left: 0.15rem;
+  padding-left: 0.95rem;
+  border-left: 2px dotted #c5c2b8;
+}
+
+.area-body > .rule {
+  margin-bottom: 0.45rem;
+}
+
+.area-body > .rule:last-child {
+  margin-bottom: 0;
+}
+
+.area-group .passed-block {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+.area-group .passed-block summary.group {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  color: #8a877c;
+}
+
+.area-group .passed-block .rule {
+  margin-left: 0.15rem;
+}
+
+.rule {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.rule summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+}
+
+.rule summary::-webkit-details-marker { display: none; }
+
+.rule summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+.rule[open] summary::after { content: "–"; }
+
+.rule[open] {
+  border-color: #d4d1c7;
+}
+
+.rule[open] summary {
+  background: #fafaf7;
+}
+
+.rule .body {
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+  background: #f0eee8;
+}
+
+.rule .body h4 {
+  margin: 0.85rem 0 0.25rem;
+  color: var(--ink);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rule .body p, .rule .body ul { margin: 0.25rem 0 0; }
+.rule .body ul { padding-left: 1.1rem; }
+
+.badge {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+}
+
+.badge-fail { background: var(--fail-bg); color: var(--fail); }
+.badge-partial { background: var(--partial-bg); color: var(--partial); }
+.badge-pass { background: var(--pass-bg); color: var(--pass); }
+.badge-unknown { background: var(--unknown-bg); color: var(--unknown); }
+.badge-na { background: var(--na-bg); color: var(--na); }
+
+.badge-id {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.prio {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+  border: 1px solid var(--line);
+}
+
+.prio-high { color: var(--high); border-color: #fecdca; background: #fff; }
+.prio-medium { color: var(--medium); border-color: #fedf89; background: #fff; }
+.prio-low { color: var(--low); border-color: #b2ddff; background: #fff; }
+
+.rule-title {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0.1rem;
+}
+
+.passed-block {
+  scroll-margin-top: 1.25rem;
+  margin-top: 1rem;
+}
+
+.passed-block summary.group {
+  font-weight: 700;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+  </style>
 </head>
 <body>
-  <!-- Method modals: checkbox + label keeps the method sentence inline (no <details> line breaks). -->
+  <!-- Method / area modals: each checkbox is immediately followed by its panel. -->
   <input type="checkbox" id="modal-skill" class="method-modal-toggle" />
-  <input type="checkbox" id="modal-rules" class="method-modal-toggle" />
-
   <div class="method-modal method-modal-skill" role="dialog" aria-label="SKILL.md">
     <label class="method-pop-backdrop" for="modal-skill" aria-label="Close"></label>
     <div class="method-pop-panel">
@@ -18,13 +880,15 @@
         <h3>SKILL.md</h3>
         <div class="skill-file-actions">
           <a href="skill-sources/SKILL.md" target="_blank" rel="noopener">Open file</a>
+          <button type="button" class="method-pop-copy">Copy</button>
           <label class="method-pop-close" for="modal-skill">Close</label>
         </div>
       </div>
-      <pre class="skill-file-body">{{SKILL_MD}}</pre>
+      <pre class="skill-file-body">{{EMBED_SKILL_MD}}</pre>
     </div>
   </div>
 
+  <input type="checkbox" id="modal-rules" class="method-modal-toggle" />
   <div class="method-modal method-modal-rules" role="dialog" aria-label="rules.md">
     <label class="method-pop-backdrop" for="modal-rules" aria-label="Close"></label>
     <div class="method-pop-panel">
@@ -32,10 +896,331 @@
         <h3>rules.md</h3>
         <div class="skill-file-actions">
           <a href="skill-sources/rules.md" target="_blank" rel="noopener">Open file</a>
+          <button type="button" class="method-pop-copy">Copy</button>
           <label class="method-pop-close" for="modal-rules">Close</label>
         </div>
       </div>
-      <pre class="skill-file-body">{{RULES_MD}}</pre>
+      <pre class="skill-file-body">{{EMBED_RULES_MD}}</pre>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-T" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Titles &amp; meta descriptions">
+    <label class="method-pop-backdrop" for="modal-area-T" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>1. Titles &amp; meta descriptions</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-T">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Titles and meta descriptions are the primary snippets search engines show in results. Weak, missing, or duplicated copy reduces click-through and makes pages harder to distinguish in the index.</p>
+        <h4>How to fix</h4>
+        <p>Give every indexable template a unique <code>&lt;title&gt;</code> and meta description, keep lengths in a readable range (~30–60 / ~70–155 chars), and wire CMS or front-matter fields so pages are not stuck on empty defaults.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-C" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Crawlability &amp; indexability">
+    <label class="method-pop-backdrop" for="modal-area-C" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>2. Crawlability &amp; indexability</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-C">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>If crawlers cannot fetch or are told not to index important URLs, rankings and discovery fail regardless of on-page quality.</p>
+        <h4>How to fix</h4>
+        <p>Ship a production <code>robots.txt</code> that does not blanket-disallow the site, publish an XML sitemap (and reference it with <code>Sitemap:</code>), keep <code>noindex</code> only on intentional pages, and exclude drafts from the live sitemap.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-N" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Canonical URLs">
+    <label class="method-pop-backdrop" for="modal-area-N" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>3. Canonical URLs</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-N">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Canonicals consolidate duplicate URL variants (www/apex, trailing slash, parameters) so ranking signals and indexing land on one preferred URL.</p>
+        <h4>How to fix</h4>
+        <p>Emit a self-referencing <code>rel=canonical</code> on page templates, align <code>baseURL</code> / site config with the live host, and keep host and trailing-slash policy consistent across links and tags.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-M" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Mobile-first basics">
+    <label class="method-pop-backdrop" for="modal-area-M" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>4. Mobile-first basics</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-M">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Google indexes with a mobile-first crawler. Broken viewports or desktop-only shells hurt usability signals and how content is understood on small screens.</p>
+        <h4>How to fix</h4>
+        <p>Include <code>meta name="viewport"</code>, use responsive layout for main content, and provide usable mobile navigation with adequate touch targets.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-P" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Performance / CWV readiness">
+    <label class="method-pop-backdrop" for="modal-area-P" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>5. Performance / CWV readiness</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-P">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Slow LCP, layout shift, and blocked rendering reduce engagement and can weigh against rankings. Lab CWV from PSI/Unlighthouse makes the gaps concrete.</p>
+        <h4>How to fix</h4>
+        <p>Do not lazy-load the LCP image, compress oversized assets, trim heavy head scripts, load fonts without FOIT where possible, and attach PSI when available to track Performance / CWV scores.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-H" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="HTTPS / host">
+    <label class="method-pop-backdrop" for="modal-area-H" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>6. HTTPS / host</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-H">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Secure HTTPS is a baseline trust and ranking expectation. Mixed content and insecure absolute URLs break assets and confuse crawlers.</p>
+        <h4>How to fix</h4>
+        <p>Serve the production site on <code>https</code>, make absolute asset and OG URLs https, and avoid protocol-relative <code>//</code> resource URLs.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-S" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Semantic HTML &amp; headings">
+    <label class="method-pop-backdrop" for="modal-area-S" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>7. Semantic HTML &amp; headings</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-S">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Clear document language, a single primary H1, and logical heading hierarchy help crawlers and assistive tech understand page structure and topic.</p>
+        <h4>How to fix</h4>
+        <p>Set <code>lang</code> on <code>&lt;html&gt;</code>, use one H1 per page type, keep heading order sensible, and include <code>&lt;main&gt;</code> plus header/nav landmarks.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-I" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Image SEO">
+    <label class="method-pop-backdrop" for="modal-area-I" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>8. Image SEO</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-I">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Alt text makes images understandable for search and accessibility. Missing alts lose Image Search relevance and create accessibility failures.</p>
+        <h4>How to fix</h4>
+        <p>Ensure image components support <code>alt</code>, write meaningful alts for content images, use empty alt for decorative images, and prefer modern formats (WebP/AVIF) when the pipeline allows.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-J" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="JSON-LD structured data">
+    <label class="method-pop-backdrop" for="modal-area-J" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>9. JSON-LD structured data</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-J">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>JSON-LD clarifies entities (Organization, WebSite, Article, breadcrumbs) for rich results and machine understanding. Crawlers often miss this if you only look at HTML text.</p>
+        <h4>How to fix</h4>
+        <p>Add valid <code>application/ld+json</code> that matches visible content—at least Organization or WebSite sitewide, Article on article templates, and BreadcrumbList when the IA is multi-level.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-U" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Clean URL structure">
+    <label class="method-pop-backdrop" for="modal-area-U" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>10. Clean URL structure</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-U">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Readable, stable URLs and fewer redirect hops preserve crawl budget and link equity and make sharing clearer.</p>
+        <h4>How to fix</h4>
+        <p>Use readable slugs, limit alias sprawl, point internal links at final URLs (not redirect chains), and avoid unnecessary query-param variants in primary navigation.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-L" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Internal linking">
+    <label class="method-pop-backdrop" for="modal-area-L" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>11. Internal linking</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-L">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Internal links distribute authority, help discovery of key pages, and give crawlers meaningful anchor context.</p>
+        <h4>How to fix</h4>
+        <p>Link money pages from primary nav, cover utilities in footer/secondary nav, use accessible anchor text (not empty links), and reduce obvious orphans where detectable.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-O" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Open Graph / Twitter cards">
+    <label class="method-pop-backdrop" for="modal-area-O" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>12. Open Graph / Twitter cards</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-O">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>OG and Twitter tags control how URLs look when shared on social and chat surfaces—often the first brand impression outside SERPs.</p>
+        <h4>How to fix</h4>
+        <p>Set <code>og:title</code>, <code>og:description</code>, and <code>og:image</code> (page or site default), plus <code>og:url</code> / <code>og:type</code> and <code>twitter:card</code>, keeping Twitter fields aligned with OG.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-E" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Status codes &amp; error UX">
+    <label class="method-pop-backdrop" for="modal-area-E" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>13. Status codes &amp; error UX</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-E">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Correct status codes and a real 404 experience prevent soft-404s, wasted crawl budget, and dead ends for users and bots.</p>
+        <h4>How to fix</h4>
+        <p>Ship a custom 404 (or framework not-found) page, avoid thin error content returning 200, and triage endemic internal 4xx / broken links from crawl exports.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-R" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="International / hreflang">
+    <label class="method-pop-backdrop" for="modal-area-R" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>14. International / hreflang</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-R">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>On multilingual sites, hreflang tells search engines which language/region variant to show and reduces duplicate-content confusion across locales.</p>
+        <h4>How to fix</h4>
+        <p>If multilingual: implement reciprocal hreflang (or equivalent) and <code>x-default</code>. If single-language: mark these checks <code>n/a</code> and avoid bogus hreflang in the sitemap.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-B" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Crawl-budget polish">
+    <label class="method-pop-backdrop" for="modal-area-B" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>15. Crawl-budget polish</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-B">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Low-value taxonomies, facet URLs, and noisy prefetch patterns waste crawl budget that should go to money pages.</p>
+        <h4>How to fix</h4>
+        <p>Noindex or disable thin tags/taxonomies, avoid heavily linking irrelevant filters, and do not abuse preconnect/prefetch on every third party.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-X" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Attachment-driven / SF extras">
+    <label class="method-pop-backdrop" for="modal-area-X" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>Attachment-driven / SF extras</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-X">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Screaming Frog Issues and PageSpeed exports are independent evidence. Leaving Critical/High crawl issues or poor PSI scores unexplained means the audit ignored measured reality.</p>
+        <h4>How to fix</h4>
+        <p>When SF/PSI attachments are present, map Critical/High issues into matching rules, triage duplicates/alts/thin pages, and document Performance + SEO category scores and CWV lab metrics in Evidence. Without attachments, mark these checks <code>unknown</code> or <code>n/a</code> as noted in rules.md.</p>
+      </div>
     </div>
   </div>
 
@@ -140,35 +1325,35 @@
             <tbody>
               <tr>
                 <td>High</td>
-                <td><a class="count count-fail" href="#prio-high-fail">{{H_FAIL}}</a></td>
-                <td><a class="count count-partial" href="#prio-high-partial">{{H_PARTIAL}}</a></td>
-                <td><a class="count count-pass" href="#prio-passed">{{H_PASS}}</a></td>
-                <td><a class="count count-unknown" href="#prio-passed">{{H_UNKNOWN}}</a></td>
-                <td><a class="count count-na" href="#prio-passed">{{H_NA}}</a></td>
+                <td>{{H_FAIL}}</td>
+                <td>{{H_PARTIAL}}</td>
+                <td>{{H_PASS}}</td>
+                <td>{{H_UNKNOWN}}</td>
+                <td>{{H_NA}}</td>
               </tr>
               <tr>
                 <td>Medium</td>
-                <td><a class="count count-fail" href="#prio-medium-fail">{{M_FAIL}}</a></td>
-                <td><a class="count count-partial" href="#prio-medium-partial">{{M_PARTIAL}}</a></td>
-                <td><a class="count count-pass" href="#prio-passed">{{M_PASS}}</a></td>
-                <td><a class="count count-unknown" href="#prio-passed">{{M_UNKNOWN}}</a></td>
-                <td><a class="count count-na" href="#prio-passed">{{M_NA}}</a></td>
+                <td>{{M_FAIL}}</td>
+                <td>{{M_PARTIAL}}</td>
+                <td>{{M_PASS}}</td>
+                <td>{{M_UNKNOWN}}</td>
+                <td>{{M_NA}}</td>
               </tr>
               <tr>
                 <td>Low</td>
-                <td><a class="count count-fail" href="#prio-low-fail">{{L_FAIL}}</a></td>
-                <td><a class="count count-partial" href="#prio-low-partial">{{L_PARTIAL}}</a></td>
-                <td><a class="count count-pass" href="#prio-passed">{{L_PASS}}</a></td>
-                <td><a class="count count-unknown" href="#prio-passed">{{L_UNKNOWN}}</a></td>
-                <td><a class="count count-na" href="#prio-passed">{{L_NA}}</a></td>
+                <td>{{L_FAIL}}</td>
+                <td>{{L_PARTIAL}}</td>
+                <td>{{L_PASS}}</td>
+                <td>{{L_UNKNOWN}}</td>
+                <td>{{L_NA}}</td>
               </tr>
               <tr class="total-row">
                 <td>Total</td>
-                <td><a class="count count-fail" href="#prio-high-fail">{{COUNT_FAIL}}</a></td>
-                <td><a class="count count-partial" href="#prio-high-partial">{{COUNT_PARTIAL}}</a></td>
-                <td><a class="count count-pass" href="#prio-passed">{{COUNT_PASS}}</a></td>
-                <td><a class="count count-unknown" href="#prio-passed">{{COUNT_UNKNOWN}}</a></td>
-                <td><a class="count count-na" href="#prio-passed">{{COUNT_NA}}</a></td>
+                <td>{{COUNT_FAIL_CELL}}</td>
+                <td>{{COUNT_PARTIAL_CELL}}</td>
+                <td>{{COUNT_PASS_CELL}}</td>
+                <td>{{COUNT_UNKNOWN_CELL}}</td>
+                <td>{{COUNT_NA_CELL}}</td>
               </tr>
             </tbody>
           </table>
@@ -190,7 +1375,9 @@
           <h2>Overview</h2>
           <!--
             Fixed order from rules.md (1–15) + Attachment-driven / SF extras.
-            Count cells link to #area-T … #area-X (and Total → first area with fails, or #area-T).
+            Rule area names open hardcoded Why / How to fix dialogs (modal-area-*).
+            Count cells link to #area-T … #area-X (Total → first area with fails, or #area-T).
+            Each count placeholder is a full cell value: <a class="count …"> or <span class="count count-zero">0</span>.
           -->
           <table class="priority-summary rule-summary">
             <thead>
@@ -204,7 +1391,142 @@
               </tr>
             </thead>
             <tbody>
-              {{AREA_ROWS}}
+              <tr>
+                <td><span class="area-num">1.</span> <label class="method-link" for="modal-area-T">Titles &amp; meta descriptions</label></td>
+                <td>{{AREA_T_FAIL}}</td>
+                <td>{{AREA_T_PARTIAL}}</td>
+                <td>{{AREA_T_PASS}}</td>
+                <td>{{AREA_T_UNKNOWN}}</td>
+                <td>{{AREA_T_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">2.</span> <label class="method-link" for="modal-area-C">Crawlability &amp; indexability</label></td>
+                <td>{{AREA_C_FAIL}}</td>
+                <td>{{AREA_C_PARTIAL}}</td>
+                <td>{{AREA_C_PASS}}</td>
+                <td>{{AREA_C_UNKNOWN}}</td>
+                <td>{{AREA_C_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">3.</span> <label class="method-link" for="modal-area-N">Canonical URLs</label></td>
+                <td>{{AREA_N_FAIL}}</td>
+                <td>{{AREA_N_PARTIAL}}</td>
+                <td>{{AREA_N_PASS}}</td>
+                <td>{{AREA_N_UNKNOWN}}</td>
+                <td>{{AREA_N_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">4.</span> <label class="method-link" for="modal-area-M">Mobile-first basics</label></td>
+                <td>{{AREA_M_FAIL}}</td>
+                <td>{{AREA_M_PARTIAL}}</td>
+                <td>{{AREA_M_PASS}}</td>
+                <td>{{AREA_M_UNKNOWN}}</td>
+                <td>{{AREA_M_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">5.</span> <label class="method-link" for="modal-area-P">Performance / CWV readiness</label></td>
+                <td>{{AREA_P_FAIL}}</td>
+                <td>{{AREA_P_PARTIAL}}</td>
+                <td>{{AREA_P_PASS}}</td>
+                <td>{{AREA_P_UNKNOWN}}</td>
+                <td>{{AREA_P_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">6.</span> <label class="method-link" for="modal-area-H">HTTPS / host</label></td>
+                <td>{{AREA_H_FAIL}}</td>
+                <td>{{AREA_H_PARTIAL}}</td>
+                <td>{{AREA_H_PASS}}</td>
+                <td>{{AREA_H_UNKNOWN}}</td>
+                <td>{{AREA_H_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">7.</span> <label class="method-link" for="modal-area-S">Semantic HTML &amp; headings</label></td>
+                <td>{{AREA_S_FAIL}}</td>
+                <td>{{AREA_S_PARTIAL}}</td>
+                <td>{{AREA_S_PASS}}</td>
+                <td>{{AREA_S_UNKNOWN}}</td>
+                <td>{{AREA_S_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">8.</span> <label class="method-link" for="modal-area-I">Image SEO</label></td>
+                <td>{{AREA_I_FAIL}}</td>
+                <td>{{AREA_I_PARTIAL}}</td>
+                <td>{{AREA_I_PASS}}</td>
+                <td>{{AREA_I_UNKNOWN}}</td>
+                <td>{{AREA_I_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">9.</span> <label class="method-link" for="modal-area-J">JSON-LD structured data</label></td>
+                <td>{{AREA_J_FAIL}}</td>
+                <td>{{AREA_J_PARTIAL}}</td>
+                <td>{{AREA_J_PASS}}</td>
+                <td>{{AREA_J_UNKNOWN}}</td>
+                <td>{{AREA_J_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">10.</span> <label class="method-link" for="modal-area-U">Clean URL structure</label></td>
+                <td>{{AREA_U_FAIL}}</td>
+                <td>{{AREA_U_PARTIAL}}</td>
+                <td>{{AREA_U_PASS}}</td>
+                <td>{{AREA_U_UNKNOWN}}</td>
+                <td>{{AREA_U_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">11.</span> <label class="method-link" for="modal-area-L">Internal linking</label></td>
+                <td>{{AREA_L_FAIL}}</td>
+                <td>{{AREA_L_PARTIAL}}</td>
+                <td>{{AREA_L_PASS}}</td>
+                <td>{{AREA_L_UNKNOWN}}</td>
+                <td>{{AREA_L_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">12.</span> <label class="method-link" for="modal-area-O">Open Graph / Twitter cards</label></td>
+                <td>{{AREA_O_FAIL}}</td>
+                <td>{{AREA_O_PARTIAL}}</td>
+                <td>{{AREA_O_PASS}}</td>
+                <td>{{AREA_O_UNKNOWN}}</td>
+                <td>{{AREA_O_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">13.</span> <label class="method-link" for="modal-area-E">Status codes &amp; error UX</label></td>
+                <td>{{AREA_E_FAIL}}</td>
+                <td>{{AREA_E_PARTIAL}}</td>
+                <td>{{AREA_E_PASS}}</td>
+                <td>{{AREA_E_UNKNOWN}}</td>
+                <td>{{AREA_E_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">14.</span> <label class="method-link" for="modal-area-R">International / hreflang</label></td>
+                <td>{{AREA_R_FAIL}}</td>
+                <td>{{AREA_R_PARTIAL}}</td>
+                <td>{{AREA_R_PASS}}</td>
+                <td>{{AREA_R_UNKNOWN}}</td>
+                <td>{{AREA_R_NA}}</td>
+              </tr>
+              <tr>
+                <td><span class="area-num">15.</span> <label class="method-link" for="modal-area-B">Crawl-budget polish</label></td>
+                <td>{{AREA_B_FAIL}}</td>
+                <td>{{AREA_B_PARTIAL}}</td>
+                <td>{{AREA_B_PASS}}</td>
+                <td>{{AREA_B_UNKNOWN}}</td>
+                <td>{{AREA_B_NA}}</td>
+              </tr>
+              <tr>
+                <td><label class="method-link" for="modal-area-X">Attachment-driven / SF extras</label></td>
+                <td>{{AREA_X_FAIL}}</td>
+                <td>{{AREA_X_PARTIAL}}</td>
+                <td>{{AREA_X_PASS}}</td>
+                <td>{{AREA_X_UNKNOWN}}</td>
+                <td>{{AREA_X_NA}}</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td>{{AREA_TOTAL_FAIL}}</td>
+                <td>{{AREA_TOTAL_PARTIAL}}</td>
+                <td>{{AREA_TOTAL_PASS}}</td>
+                <td>{{AREA_TOTAL_UNKNOWN}}</td>
+                <td>{{AREA_TOTAL_NA}}</td>
+              </tr>
             </tbody>
           </table>
         </section>
@@ -226,5 +1548,74 @@
     </div>
 
   </div>
+  <script>
+    (function () {
+      function applyOverviewRowColors() {
+        document.querySelectorAll("table.priority-summary tbody tr").forEach(function (tr) {
+          var cells = tr.querySelectorAll("td");
+          if (cells.length < 3) return;
+          var fail = parseInt((cells[1].textContent || "0").replace(/\s+/g, ""), 10);
+          var partial = parseInt((cells[2].textContent || "0").replace(/\s+/g, ""), 10);
+          if (isNaN(fail)) fail = 0;
+          if (isNaN(partial)) partial = 0;
+          tr.classList.remove("row-fail", "row-partial", "row-pass");
+          if (fail > 0) tr.classList.add("row-fail");
+          else if (partial > 0) tr.classList.add("row-partial");
+          else tr.classList.add("row-pass");
+        });
+      }
+      applyOverviewRowColors();
+
+      /* Open/close modals without focusing the checkbox (avoids scroll-to-top). */
+      document.addEventListener("click", function (e) {
+        var label = e.target.closest("label[for]");
+        if (!label) return;
+        var input = document.getElementById(label.getAttribute("for"));
+        if (!input || !input.classList.contains("method-modal-toggle")) return;
+        e.preventDefault();
+        var closes = label.classList.contains("method-pop-close") || label.classList.contains("method-pop-backdrop");
+        input.checked = !closes;
+      });
+
+      document.querySelectorAll(".method-pop-copy").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var panel = btn.closest(".method-pop-panel");
+          if (!panel) return;
+          var body = panel.querySelector(".skill-file-body, .area-guide-body");
+          if (!body) return;
+          var text = body.tagName === "PRE" ? body.textContent : body.innerText;
+          function done() {
+            var prev = btn.textContent;
+            btn.textContent = "Copied";
+            btn.classList.add("is-copied");
+            setTimeout(function () {
+              btn.textContent = prev;
+              btn.classList.remove("is-copied");
+            }, 1500);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(function () {
+              fallbackCopy(text, done);
+            });
+          } else {
+            fallbackCopy(text, done);
+          }
+        });
+      });
+
+      function fallbackCopy(text, done) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (err) {}
+        document.body.removeChild(ta);
+        done();
+      }
+    })();
+  </script>
 </body>
 </html>

@@ -11,7 +11,7 @@ Ask Cursor for a technical SEO audit, scorecard, or HTML audit report — especi
 1. Creates a new dated folder `audit/YYYY-MM-DD-HHmm/` in the project (never reuses a previous run).
 2. Copies any attachments into `attachments/` and snapshots this skill’s `SKILL.md` + `rules.md` into `skill-sources/`.
 3. Evaluates every rule in [`rules.md`](rules.md) against the codebase (and attachments), scoring each as pass / partial / fail / n/a / unknown.
-4. Builds `index.html` from [`report-template.html`](report-template.html) + [`report.css`](report.css) — pass-rate gauge, status tiles, By priority / By rule views, and collapsible findings.
+4. Builds a self-contained `index.html` from [`report-template.html`](report-template.html) (CSS inlined) — pass-rate gauge, status tiles, By priority / By rule views, and collapsible findings.
 5. Writes `meta.json` (machine summary) and `handoff.md` (IMP-* tasks for High/Medium fail & partial rules).
 6. Stops and points you at `index.html`. Fixes are left to [`technical-seo-implement`](../technical-seo-implement/).
 
@@ -19,8 +19,7 @@ Ask Cursor for a technical SEO audit, scorecard, or HTML audit report — especi
 
 | File | Role |
 |---|---|
-| `index.html` | Client-facing report (open this) |
-| `report.css` | Report styles |
+| `index.html` | Client-facing report (open this; styles embedded) |
 | `meta.json` | Counts, commit, attachments, areas |
 | `handoff.md` | Implementation task list |
 | `attachments/` | Copied SF/PSI (etc.) originals |
@@ -32,8 +31,7 @@ Ask Cursor for a technical SEO audit, scorecard, or HTML audit report — especi
 |---|---|
 | [`SKILL.md`](SKILL.md) | Agent instructions (source of truth for Cursor) |
 | [`rules.md`](rules.md) | Full rule checklist the audit must evaluate |
-| [`report-template.html`](report-template.html) | HTML shell / placeholders for the report |
-| [`report.css`](report.css) | Shared report styling |
+| [`report-template.html`](report-template.html) | Self-contained HTML shell (inlined CSS + placeholders) |
 | [`meta.example.json`](meta.example.json) | Shape of `meta.json` |
 | [`checklist.md`](checklist.md) | Supporting checklist notes |
 

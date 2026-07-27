@@ -1,0 +1,3082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Technical SEO Audit — 2026-07-27 06:50 (CEST)</title>
+  <style>
+/* Technical SEO audit report — keep stable across runs */
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #5c5c5c;
+  --line: #e2e0d8;
+  --fail: #b42318;
+  --fail-bg: #fef3f2;
+  --partial: #b54708;
+  --partial-bg: #fffaeb;
+  --pass: #027a48;
+  --pass-bg: #ecfdf3;
+  --unknown: #344054;
+  --unknown-bg: #f2f4f7;
+  --na: #667085;
+  --na-bg: #f9fafb;
+  --high: #b42318;
+  --medium: #b54708;
+  --low: #175cd3;
+  --radius: 10px;
+  --font: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+a { color: #175cd3; }
+
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.header {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.55rem;
+  letter-spacing: -0.02em;
+}
+
+.header .sub {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.method {
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+
+.method-line {
+  margin: 0 0 0.45rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.method-line + .attachment-list {
+  margin-top: 0.3rem;
+}
+
+.method-line a,
+.method-link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.method-line a:hover,
+.method-link:hover { color: #175cd3; }
+
+.method-modal-toggle {
+  /* fixed so focusing the checkbox does not scroll the page to top */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.method-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* Each toggle is immediately followed by its modal panel */
+.method-modal-toggle:checked + .method-modal {
+  display: flex;
+}
+
+.method-pop-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.42);
+  cursor: pointer;
+}
+
+.method-pop-panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 94vw);
+  max-height: min(80vh, 820px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 16px 48px rgba(26, 26, 26, 0.22);
+}
+
+.method-pop-panel .skill-file-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.method-pop-panel .skill-file-head h3 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.skill-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+
+.skill-file-actions a {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skill-file-actions a:hover { text-decoration: underline; }
+
+.method-pop-close {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.method-pop-close:hover {
+  border-color: #175cd3;
+  color: #175cd3;
+}
+
+.method-pop-copy {
+  display: inline-block;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+
+.method-pop-copy:hover {
+  border-color: #175cd3;
+  color: #175cd3;
+}
+
+.method-pop-copy.is-copied {
+  border-color: var(--pass);
+  color: var(--pass);
+}
+
+.method-pop-panel .area-guide-body {
+  margin: 0;
+  padding: 0.85rem 1rem 1.1rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.method-pop-panel .area-guide-body h4 {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.method-pop-panel .area-guide-body h4:first-child {
+  margin-top: 0;
+}
+
+.method-pop-panel .area-guide-body p {
+  margin: 0 0 0.55rem;
+}
+
+.method-pop-panel .area-guide-body p:last-child {
+  margin-bottom: 0;
+}
+
+.method-pop-panel .skill-file-head.area-guide-head h3 {
+  font-family: var(--font);
+  font-size: 0.95rem;
+}
+
+.method-pop-panel .skill-file-body {
+  margin: 0;
+  padding: 0.85rem 0.95rem 1rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--bg);
+}
+
+.attachment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.attachment-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.attachment-list a:hover { border-color: #175cd3; color: #175cd3; }
+
+.attachment-list .none {
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.meta-item dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.meta-item dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+.meta-item dd a.commit-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.meta-item dd a.commit-link:hover {
+  color: #175cd3;
+}
+
+.card,
+.summary {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.card h2,
+.summary h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.overview h2 {
+  margin-bottom: 0.85rem;
+}
+
+.view-switch {
+  margin-bottom: 1.25rem;
+}
+
+.view-switch > input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.summary-tablist {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.summary-tab {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  user-select: none;
+}
+
+.summary-tab:hover { color: var(--ink); }
+
+#view-tab-priority:checked ~ .summary-tablist label[for="view-tab-priority"],
+#view-tab-rule:checked ~ .summary-tablist label[for="view-tab-rule"] {
+  color: var(--ink);
+  background: var(--bg);
+  border-color: var(--line);
+}
+
+.view-panel { display: none; }
+
+#view-tab-priority:checked ~ .view-panel-priority,
+#view-tab-rule:checked ~ .view-panel-rule {
+  display: block;
+}
+
+table.rule-summary td:first-child {
+  font-weight: 600;
+}
+
+table.rule-summary .area-num {
+  display: inline-block;
+  min-width: 1.35rem;
+  margin-right: 0.35rem;
+  color: var(--muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-hero {
+  display: grid;
+  grid-template-columns: minmax(140px, 170px) 1fr;
+  gap: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .summary-hero { grid-template-columns: 1fr; }
+}
+
+.pass-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.25rem;
+}
+
+.score-gauge {
+  position: relative;
+  width: 124px;
+  height: 124px;
+}
+
+.score-gauge svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.score-track,
+.score-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.score-track {
+  stroke: #e8e8e8;
+}
+
+.score-fill {
+  stroke: var(--score-color, var(--pass));
+  transition: stroke-dasharray 0.4s ease;
+}
+
+.score-poor { --score-color: #ff4e42; }
+.score-average { --score-color: #ffa400; }
+.score-good { --score-color: #0cce6b; }
+
+.score-poor .score-track { stroke: #ffdad6; }
+.score-average .score-track { stroke: #ffe6b8; }
+.score-good .score-track { stroke: #c9f0d8; }
+
+.score-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pass-rate-value {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--score-color, var(--pass));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pass-rate-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.pass-rate-fraction {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pass-rate-pct {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  .stat-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 420px) {
+  .stat-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.75rem 0.7rem;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  cursor: pointer;
+}
+
+.stat-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(26, 26, 26, 0.08);
+}
+
+.stat-tile.is-zero {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
+.stat-num {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-fail { background: var(--fail-bg); border-color: #fecdca; }
+.stat-fail .stat-num,
+.stat-fail .stat-label { color: var(--fail); }
+
+.stat-partial { background: var(--partial-bg); border-color: #fedf89; }
+.stat-partial .stat-num,
+.stat-partial .stat-label { color: var(--partial); }
+
+.stat-pass { background: var(--pass-bg); border-color: #abefc6; }
+.stat-pass .stat-num,
+.stat-pass .stat-label { color: var(--pass); }
+
+.stat-unknown { background: var(--unknown-bg); border-color: #d0d5dd; }
+.stat-unknown .stat-num,
+.stat-unknown .stat-label { color: var(--unknown); }
+
+.stat-na { background: var(--na-bg); border-color: #d0d5dd; }
+.stat-na .stat-num,
+.stat-na .stat-label { color: var(--na); }
+
+table.priority-summary {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+table.priority-summary th,
+table.priority-summary td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+table.priority-summary th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+table.priority-summary td:not(:first-child) {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+table.priority-summary th:not(:first-child) {
+  text-align: right;
+}
+
+table.priority-summary .total-row td {
+  border-bottom: none;
+  border-top: 2px solid var(--ink);
+  font-weight: 700;
+  padding-top: 0.7rem;
+}
+
+/* Overview row status (fail > partial > pass); applies to priority, rule, and Total */
+table.priority-summary tbody tr.row-fail td {
+  background: var(--fail-bg);
+}
+
+table.priority-summary tbody tr.row-partial td {
+  background: var(--partial-bg);
+}
+
+table.priority-summary tbody tr.row-pass td {
+  background: var(--pass-bg);
+}
+
+table.priority-summary tbody tr.row-fail td:first-child,
+table.priority-summary tbody tr.row-partial td:first-child,
+table.priority-summary tbody tr.row-pass td:first-child {
+  box-shadow: inset 3px 0 0 currentColor;
+}
+
+table.priority-summary tbody tr.row-fail td:first-child { color: var(--fail); }
+table.priority-summary tbody tr.row-partial td:first-child { color: var(--partial); }
+table.priority-summary tbody tr.row-pass td:first-child { color: var(--pass); }
+
+table.rule-summary .method-link {
+  font-weight: 600;
+}
+
+.count {
+  display: inline-block;
+  min-width: 1.5rem;
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-decoration: none;
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  transition: background 0.12s ease;
+}
+
+.count:hover { filter: brightness(0.92); }
+
+.count-fail { color: var(--fail); background: var(--fail-bg); }
+.count-partial { color: var(--partial); background: var(--partial-bg); }
+.count-pass { color: var(--pass); background: var(--pass-bg); }
+.count-unknown { color: var(--unknown); background: var(--unknown-bg); }
+.count-na { color: var(--na); background: var(--na-bg); }
+
+.count-zero {
+  color: var(--muted);
+  background: transparent;
+  font-weight: 600;
+  cursor: default;
+  pointer-events: none;
+}
+
+.result-group {
+  scroll-margin-top: 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.section-label {
+  margin: 1.5rem 0 0.65rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* By-rule area cards: title is parent; issues nest under a dotted rail */
+.area-group {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem 1rem;
+  margin-bottom: 0.85rem;
+  scroll-margin-top: 1.25rem;
+}
+
+.area-group > .section-label {
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.area-body {
+  margin-left: 0.15rem;
+  padding-left: 0.95rem;
+  border-left: 2px dotted #c5c2b8;
+}
+
+.area-body > .rule {
+  margin-bottom: 0.45rem;
+}
+
+.area-body > .rule:last-child {
+  margin-bottom: 0;
+}
+
+.area-group .passed-block {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+.area-group .passed-block summary.group {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  color: #8a877c;
+}
+
+.area-group .passed-block .rule {
+  margin-left: 0.15rem;
+}
+
+.rule {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.rule summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+}
+
+.rule summary::-webkit-details-marker { display: none; }
+
+.rule summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+.rule[open] summary::after { content: "–"; }
+
+.rule[open] {
+  border-color: #d4d1c7;
+}
+
+.rule[open] summary {
+  background: #fafaf7;
+}
+
+.rule .body {
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+  background: #f0eee8;
+}
+
+.rule .body h4 {
+  margin: 0.85rem 0 0.25rem;
+  color: var(--ink);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rule .body p, .rule .body ul { margin: 0.25rem 0 0; }
+.rule .body ul { padding-left: 1.1rem; }
+
+.badge {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+}
+
+.badge-fail { background: var(--fail-bg); color: var(--fail); }
+.badge-partial { background: var(--partial-bg); color: var(--partial); }
+.badge-pass { background: var(--pass-bg); color: var(--pass); }
+.badge-unknown { background: var(--unknown-bg); color: var(--unknown); }
+.badge-na { background: var(--na-bg); color: var(--na); }
+
+.badge-id {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.prio {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+  border: 1px solid var(--line);
+}
+
+.prio-high { color: var(--high); border-color: #fecdca; background: #fff; }
+.prio-medium { color: var(--medium); border-color: #fedf89; background: #fff; }
+.prio-low { color: var(--low); border-color: #b2ddff; background: #fff; }
+
+.rule-title {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0.1rem;
+}
+
+.passed-block {
+  scroll-margin-top: 1.25rem;
+  margin-top: 1rem;
+}
+
+.passed-block summary.group {
+  font-weight: 700;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+  </style>
+</head>
+<body>
+  <!-- Method / area modals: each checkbox is immediately followed by its panel. -->
+  <input type="checkbox" id="modal-skill" class="method-modal-toggle" />
+  <div class="method-modal method-modal-skill" role="dialog" aria-label="SKILL.md">
+    <label class="method-pop-backdrop" for="modal-skill" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head">
+        <h3>SKILL.md</h3>
+        <div class="skill-file-actions">
+          <a href="../SKILL.md" target="_blank" rel="noopener">Open file</a>
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-skill">Close</label>
+        </div>
+      </div>
+      <pre class="skill-file-body">---
+name: technical-seo-audit
+description: &gt;-
+  Runs a technical SEO audit on a static-site frontend, evaluates 60+ rules
+  (15 checklist areas + Screaming Frog Issues), and writes a dated HTML report
+  under audit/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results,
+  attachments, and commit hash. Use when the user asks for a technical SEO
+  audit, SEO scorecard, or audit report.
+---
+
+# Technical SEO Audit
+
+Audit-only. Do **not** implement fixes. Produce a **self-contained HTML report** plus a handoff file for `technical-seo-implement`.
+
+## When to run
+
+User asks for a technical SEO audit / scorecard / HTML audit report, or attaches Screaming Frog Issues / PageSpeed (PSI) exports.
+
+## Inputs
+
+| Input | Required | Notes |
+|-------|----------|--------|
+| Codebase | Yes | Project root |
+| Attachments | No | SF Issues CSV, PSI HTML/JSON/PDF/screenshots, Unlighthouse export, etc. |
+| Site URL | No | Optional context for host/canonical checks — **do not** put in the HTML header |
+
+Copy every user-attached audit artifact into the report folder (see below).
+
+## Output layout
+
+Create (never reuse a folder name — each run gets its own directory):
+
+```text
+audit/YYYY-MM-DD-HHmm/
+  index.html              # Main report (open this) — self-contained (CSS inlined)
+  meta.json               # Machine-readable summary
+  handoff.md              # For technical-seo-implement
+  skill-sources/
+    SKILL.md              # Verbatim copy used for this run
+    rules.md              # Verbatim copy used for this run
+  attachments/            # Copied originals
+    &lt;original-filename&gt;
+```
+
+- Always use **local date + time**: `audit/YYYY-MM-DD-HHmm/` (24h clock, zero-padded). Example: `audit/2026-07-24-1512/`.
+- If that exact minute folder already exists, append seconds: `audit/YYYY-MM-DD-HHmmss/`.
+- Resolve **git commit**: `git rev-parse --short HEAD` (and note dirty tree if `git status --porcelain` is non-empty). If not a git repo, set commit to `n/a`.
+- Resolve **commit URL** from `git remote get-url origin` (or first remote):
+  - **GitHub** (`github.com`): `https://github.com/&lt;owner&gt;/&lt;repo&gt;/commit/&lt;full-sha&gt;`
+  - **GitLab** (`gitlab.com` or a host containing `gitlab`): `https://&lt;host&gt;/&lt;namespace&gt;/&lt;repo&gt;/-/commit/&lt;full-sha&gt;`
+  - Strip trailing `.git`; support SSH (`git@host:path.git`) and HTTPS remotes
+  - Use **full SHA** in the URL; display the **short** hash in the UI (link opens in a new tab: `target=&quot;_blank&quot;` `rel=&quot;noopener&quot;`)
+  - Dirty trees: keep the link on the hash only, append ` (dirty)` as plain text
+  - If no recognizable remote: plain text hash (no link)
+- Display **date with time and timezone** in the report header (e.g. `2026-07-24 15:16 (CEST)` or `2026-07-24 15:16 (UTC+2)`). Store the same in `meta.json` `date`. Store `commit`, `commitFull`, `commitUrl` (or `null`), `commitDirty` in `meta.json`.
+
+## Workflow
+
+1. Create `audit/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
+2. Copy all provided attachments into `attachments/` (preserve filenames). Record them in `meta.json` and the HTML header as links (`target=&quot;_blank&quot;` `rel=&quot;noopener&quot;`).
+3. Copy this skill’s `SKILL.md` and `rules.md` into `skill-sources/` (verbatim). Embed the same full text behind the clickable **skill** / **rules** words in the method line.
+4. Record `model` (Cursor model name) and `analysisScope` (`static site files` / `a live URL` / `static site files and a live URL`).
+5. Parse SF Issues CSV if present; map rows into rules (see [rules.md](rules.md)).
+6. Evaluate **every rule** in [rules.md](rules.md) (≥60) against the codebase (+ attachments). Status: `pass` | `partial` | `fail` | `n/a` | `unknown`.
+7. Build `index.html` from [report-template.html](report-template.html). Keep the inlined `&lt;style&gt;` block and visual structure identical across runs. Do **not** emit a separate `report.css`.
+8. Write `meta.json` and `handoff.md`.
+9. Stop. Tell the user the path to `index.html`. Do not implement.
+
+## Status meanings (PageSpeed-like)
+
+| Status | UI label | Meaning |
+|--------|----------|---------|
+| `fail` | Failed | Broken / missing for important pages |
+| `partial` | Partially failed | Present but incomplete or inconsistent |
+| `pass` | Passed | Meets the rule |
+| `n/a` | N/A | Not applicable (excluded from fail rates) |
+| `unknown` | Unknown | Needs live crawl / PSI; treat like non-pass in summary counts separately |
+
+## Priorities
+
+| Priority | When |
+|----------|------|
+| **High** | Indexing, core on-page, canonicals, critical SF errors |
+| **Medium** | Important UX/SEO quality, CWV readiness, structured data, OG |
+| **Low** | Polish, soft length opportunities, security-header noise unless user asked |
+
+## Report UI requirements
+
+`index.html` **must** include, in order:
+
+1. **Header** — report title, **date with time + timezone in parentheses**, **commit hash** linked to GitHub/GitLab commit when possible (+ dirty flag if dirty). Do **not** show site URL, stack, or phase/before/after labels.
+2. **Method lines** (above the attachment chips) — two short sentences, in this order:
+
+   &gt; A [handoff.md](handoff.md) was generated so agents can fix the failed and partial issues.
+
+   &gt; This report was generated based on analysis performed by Cursor ({{MODEL}}) using the **skill** and **rules** over {{ANALYSIS_SCOPE}}, and the following attachments:
+
+   - End the second sentence with `attachments:` (colon) so it leads into the attachment chips
+   - `{{MODEL}}` — the Cursor model that ran the audit (e.g. `Composer`)
+   - `{{ANALYSIS_SCOPE}}` — one of: `static site files` · `a live URL` · `static site files and a live URL` (adjust wording only if needed for clarity)
+   - The words **skill** and **rules** are underlined inline `&lt;label&gt;` controls that open modals with the **full verbatim** `SKILL.md` / `rules.md` (plus “Open file”)
+   - Link `handoff.md` with `target=&quot;_blank&quot;` `rel=&quot;noopener&quot;`
+   - Store `model` and `analysisScope` in `meta.json`
+3. **Attachments** — list of files in `attachments/` immediately under the method lines; each link opens in a **new tab**. If none: show `None provided.`
+4. **Summary card** — pass-rate circle + accumulated status tiles only (no tables). Under the circle, a two-line label: `{{COUNT_PASS}} succ. / {{COUNT_SCORED}} total` then `{{PASS_RATE}}% pass rate`. `{{COUNT_SCORED}}` = pass + partial + fail + unknown (exclude n/a).
+5. **Tabs** — **By priority** (default) / **By rule**. Switching the tab changes both the Overview card and the issue list sort order (emit **both** lists; show/hide with the same CSS radio tabs).
+6. **Overview card** — table for the active tab:
+   - **By priority** — High / Medium / Low / Total; count links scroll to `#prio-…` sections
+   - **By rule** — 15 checklist areas in fixed `rules.md` order (+ Attachment-driven / SF extras); count links scroll to `#area-T` … `#area-X`
+   - **Row colors** — each tbody row (including Total) gets a status background via the template script: **red** if Failed &amp;gt; 0, **yellow** if Failed = 0 and Partial &amp;gt; 0, else **green**. Do not remove the footer `&lt;script&gt;` that applies `row-fail` / `row-partial` / `row-pass`.
+   - **Count cells** — replace each `{{H_FAIL}}`, `{{AREA_T_FAIL}}`, `{{COUNT_FAIL_CELL}}`, etc. with a full cell value: either `&lt;a class=&quot;count count-…&quot; href=&quot;…&quot;&gt;N&lt;/a&gt;` or `&lt;span class=&quot;count count-zero&quot;&gt;0&lt;/span&gt;` (never a bare number).
+   - **By rule names** — keep the hardcoded `&lt;label class=&quot;method-link&quot; for=&quot;modal-area-…&quot;&gt;` controls and the matching area-guide modals (Why it matters / How to fix). Do not replace area names with plain text or strip those modals.
+7. **Issue list** (sorted to match the active tab; all rules **collapsed by default**):
+   - Priority view: `#prio-high-fail` → … → `#prio-passed`
+   - Rule view: `#area-T` … `#area-B` → `#area-X`. Each area is an `.area-group` card; fail/partial rules and the nested “Passed, N/A &amp; unknown” toggle sit inside `.area-body` (indented with a dotted vertical rail) so they read as children of the area title.
+8. Each rule is a **`&lt;details&gt;` collapse**:
+   - Summary line: status badge + priority badge + rule-id badge + short title (same row)
+   - Body: **Why it matters**, **Evidence**, **How to fix**, optional **SF / PSI refs** — expanded body uses a distinct background
+9. **Method / area pops** — **skill** / **rules** and By-rule **area names** are inline `&lt;label&gt;`s (never `&lt;details&gt;` in the sentence) that open checkbox-driven modals with Copy + Close + backdrop. Keep the first method sentence as a **single HTML line**. Area guides are static (hardcoded in the template); skill/rules modals embed verbatim content via `{{EMBED_SKILL_MD}}` / `{{EMBED_RULES_MD}}`.
+
+Zero counts: use `&lt;span class=&quot;count count-zero&quot;&gt;0&lt;/span&gt;` or `stat-tile is-zero` — not a link.
+
+Use only the CSS classes already defined in the template’s inlined `&lt;style&gt;` block — unified design across audits. Keep styles embedded in `index.html` so the report renders correctly when opened alone (without `attachments/` or other sibling files).
+
+When filling `{{EMBED_SKILL_MD}}` / `{{EMBED_RULES_MD}}`, HTML-escape the full file text into the modal `&lt;pre class=&quot;skill-file-body&quot;&gt;` blocks (replace those exact placeholders only — do not globally replace bare `{{SKILL_MD}}` / `{{RULES_MD}}` strings that may appear inside the skill docs). Also copy the files to `skill-sources/SKILL.md` and `skill-sources/rules.md`. Store `skillName`, `model`, `analysisScope`, and `byArea` in `meta.json`.
+
+Each modal header includes **Copy** (clipboard) and **Close**. Keep those controls; do not remove the footer script that colors overview rows, opens modals without scrolling, and handles Copy.
+
+## Scoring (headline)
+
+Show a PageSpeed-style **pass-rate circle**:  
+`passed / (passed + partial + fail + unknown)` as a percentage (exclude `n/a`).  
+Color the gauge: &amp;lt;50 poor (red), 50–89 average (orange), ≥90 good (green).  
+Also show counts — do not invent Semrush-style “Site Health” branding.
+
+## Handoff (`handoff.md`)
+
+Generate implementation tasks only for `fail` and `partial` rules with priority High then Medium (Low only if user asked for full polish):
+
+```markdown
+# SEO implement handoff — YYYY-MM-DD
+
+Commit: &lt;hash&gt;
+Report: audit/YYYY-MM-DD-HHmm/index.html
+
+## Tasks
+### IMP-001 — &lt;rule id&gt; — &lt;title&gt;
+- Priority: High|Medium|Low
+- Status: fail|partial
+- Why: …
+- Scope: …
+- Acceptance: …
+- Evidence: …
+```
+
+## Quality bar
+
+- Evaluate **all** rules in [rules.md](rules.md) (do not stop at 15).
+- Every non-`pass` / non-`n/a` rule has evidence (path, SF issue name + URL count, or “not found in repo”).
+- Intentional `noindex` pages are not automatic High fails — call out intent under Evidence.
+- Attachments that were provided appear in the header and open in a new tab.
+- No code fixes in this skill.
+</pre>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-rules" class="method-modal-toggle" />
+  <div class="method-modal method-modal-rules" role="dialog" aria-label="rules.md">
+    <label class="method-pop-backdrop" for="modal-rules" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head">
+        <h3>rules.md</h3>
+        <div class="skill-file-actions">
+          <a href="../rules.md" target="_blank" rel="noopener">Open file</a>
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-rules">Close</label>
+        </div>
+      </div>
+      <pre class="skill-file-body"># Technical SEO rules (60+)
+
+Evaluate **every** rule. Map Screaming Frog Issues into matching rules when a CSV is attached. Group under the original 15 checklist areas.
+
+Statuses: `pass` | `partial` | `fail` | `n/a` | `unknown`  
+Priorities: `High` | `Medium` | `Low`
+
+---
+
+## 1. Titles &amp; meta descriptions
+
+| ID | Priority | Rule |
+|----|----------|------|
+| T-01 | High | Every indexable page type has a `&lt;title&gt;` template |
+| T-02 | High | Titles are unique across key pages (no sitewide duplicate title pattern) |
+| T-03 | Medium | Titles avoid being extremely short (&amp;lt;30 chars) on key pages |
+| T-04 | Medium | Titles avoid being extremely long (soft: &amp;gt;60 chars) on key pages |
+| T-05 | High | Meta description present on indexable page types |
+| T-06 | High | Meta descriptions unique across key pages |
+| T-07 | Medium | Meta descriptions not far over ~155 characters on key pages |
+| T-08 | Low | Meta descriptions not extremely short (&amp;lt;70 chars) on key marketing pages |
+| T-09 | Medium | Front matter / CMS fields exist so pages aren’t stuck on empty description |
+
+**SF:** Page Titles:*, Meta Description:*
+
+## 2. Crawlability &amp; indexability
+
+| ID | Priority | Rule |
+|----|----------|------|
+| C-01 | High | `robots.txt` exists and does not `Disallow: /` in production |
+| C-02 | High | XML sitemap exists / is generated by the build |
+| C-03 | Medium | `robots.txt` references sitemap via `Sitemap:` |
+| C-04 | High | `noindex` only on intentional pages (thank-you, steps, login, etc.) |
+| C-05 | Medium | Draft / private content not published to production sitemap |
+| C-06 | Medium | Important pages are not blocked by robots meta accidentally |
+| C-07 | Low | Search-engine disallow flag in config is off for production builds |
+
+**SF:** Directives: Noindex; robots blocked
+
+## 3. Canonical URLs
+
+| ID | Priority | Rule |
+|----|----------|------|
+| N-01 | High | Self-referencing `rel=canonical` on page templates |
+| N-02 | High | `baseURL` / site URL matches the intended production host |
+| N-03 | Medium | Canonical host consistent (www vs apex) with how the site is linked |
+| N-04 | Medium | Trailing-slash policy consistent with canonicals |
+| N-05 | Low | No conflicting multiple canonical tags in base layout |
+
+**SF:** Canonicals:*
+
+## 4. Mobile-first basics
+
+| ID | Priority | Rule |
+|----|----------|------|
+| M-01 | High | `meta name=&quot;viewport&quot;` present |
+| M-02 | Medium | Layout uses responsive CSS (not desktop-only fixed shell for main content) |
+| M-03 | Low | Touch-friendly nav patterns exist (mobile menu / adequate targets where applicable) |
+
+## 5. Performance / CWV readiness
+
+| ID | Priority | Rule |
+|----|----------|------|
+| P-01 | High | LCP candidate (hero/main image) not carelessly lazy-loaded |
+| P-02 | Medium | Fonts loaded without obvious FOIT/blocking anti-pattern where controllable |
+| P-03 | Medium | Oversized images avoided or pipeline compresses/resizes (SF: Images over size) |
+| P-04 | Medium | Heavy third-party scripts in `&lt;head&gt;` minimized |
+| P-05 | Medium | Page loader / overlays don’t permanently block content indexing signals |
+| P-06 | Low | Preconnect/preload used for critical origins where helpful |
+| P-07 | High | If PSI attached: Performance not in “poor” band without noted plan (`unknown` if no PSI) |
+
+**SF:** Images: Over * kB; PSI attachment for P-07
+
+## 6. HTTPS / host
+
+| ID | Priority | Rule |
+|----|----------|------|
+| H-01 | High | Production site URL uses `https` |
+| H-02 | Medium | Absolute asset / OG URLs use https |
+| H-03 | Low | Protocol-relative `//` resource URLs avoided (SF security/perf) |
+
+## 7. Semantic HTML &amp; headings
+
+| ID | Priority | Rule |
+|----|----------|------|
+| S-01 | High | `lang` (or `languageCode`) set on `&lt;html&gt;` / site config |
+| S-02 | High | One primary `h1` pattern per page type |
+| S-03 | Medium | Heading hierarchy logical (no chaotic skips sitewide) |
+| S-04 | Medium | `&lt;main&gt;` landmark present |
+| S-05 | Medium | Nav/header semantics present |
+| S-06 | Low | Duplicate sitewide H2 boilerplate avoided on distinct URLs (SF: H2 Duplicate) |
+| S-07 | Low | H1 length remains readable (SF: H1 Over * Characters) |
+
+**SF:** H1:*, H2:*
+
+## 8. Image SEO
+
+| ID | Priority | Rule |
+|----|----------|------|
+| I-01 | High | Content image components support `alt` |
+| I-02 | High | Meaningful images don’t systematically omit alt (SF: Missing Alt Text) |
+| I-03 | Medium | Decorative images can use empty alt |
+| I-04 | Medium | Linked images without text have alt or accessible name |
+| I-05 | Low | Modern formats (WebP/AVIF) used where the pipeline allows |
+
+**SF:** Images: Missing Alt Text
+
+## 9. JSON-LD structured data
+
+| ID | Priority | Rule |
+|----|----------|------|
+| J-01 | High | JSON-LD (`application/ld+json`) present for Organization or WebSite (or equivalent) |
+| J-02 | Medium | Structured data matches visible brand/entity |
+| J-03 | Medium | Article/BlogPosting (or similar) on article templates if site has articles |
+| J-04 | Low | BreadcrumbList where multi-level IA exists |
+| J-05 | Low | Microdata-only without JSON-LD counted as partial at best |
+
+**SF blind spot** — always verify in code.
+
+## 10. Clean URL structure
+
+| ID | Priority | Rule |
+|----|----------|------|
+| U-01 | Medium | Readable slugs / paths |
+| U-02 | Medium | Alias sprawl limited (`disableAliases` or equivalent where intended) |
+| U-03 | High | Internal links prefer final URLs over redirect hops (SF: Internal Redirection) |
+| U-04 | Low | No unnecessary query-param variants in primary nav |
+
+**SF:** Response Codes: Internal Redirection
+
+## 11. Internal linking
+
+| ID | Priority | Rule |
+|----|----------|------|
+| L-01 | High | Primary nav links to key money pages |
+| L-02 | Medium | Footer or secondary nav covers important utility pages |
+| L-03 | Medium | Internal links have accessible/anchor text (SF: No Anchor Text) |
+| L-04 | Low | Key pages are not obvious orphans (few/no inlinks) when detectable |
+
+**SF:** Links: Internal Outlinks With No Anchor Text
+
+## 12. Open Graph / Twitter
+
+| ID | Priority | Rule |
+|----|----------|------|
+| O-01 | High | `og:title` present |
+| O-02 | High | `og:description` present |
+| O-03 | High | `og:image` present (page or site default) |
+| O-04 | Medium | `og:url` present |
+| O-05 | Medium | `og:type` present |
+| O-06 | Medium | `twitter:card` present |
+| O-07 | Low | Twitter title/description/image aligned with OG |
+
+**SF blind spot** — verify in code.
+
+## 13. Status codes &amp; error UX
+
+| ID | Priority | Rule |
+|----|----------|------|
+| E-01 | High | Custom 404 (or framework not-found) page exists |
+| E-02 | Medium | Soft-404 risk avoided (thin error pages returning 200 without clear 404 handling at host — note if unknown) |
+| E-03 | Medium | Broken internal links not endemic (SF 4xx internal if present) |
+| E-04 | Low | External 4xx in SF reviewed (fix or ignore) |
+
+**SF:** Response Codes:*
+
+## 14. International / hreflang
+
+| ID | Priority | Rule |
+|----|----------|------|
+| R-01 | High | If multilingual: `hreflang` (or equivalent) present — else `n/a` |
+| R-02 | Medium | If multilingual: `x-default` set — else `n/a` |
+| R-03 | Low | Sitemap xhtml/hreflang links not wrongly duplicated for a single-language site |
+
+## 15. Crawl-budget polish
+
+| ID | Priority | Rule |
+|----|----------|------|
+| B-01 | Medium | Thin taxonomies/tags disabled or noindexed if low value |
+| B-02 | Low | Prefetch/preconnect not abused on every third party |
+| B-03 | Low | Faceted/filter URLs not heavily linked when irrelevant |
+| B-04 | Low | `llms.txt` / agents file optional — `n/a` unless user requested |
+
+## Attachment-driven / SF extras
+
+Evaluate when SF CSV or PSI is attached; otherwise `unknown` or `n/a` as noted.
+
+| ID | Priority | Rule |
+|----|----------|------|
+| X-01 | High | SF Critical/High issues reviewed and mapped (none left unexplained) |
+| X-02 | Medium | SF duplicate titles resolved or accepted with evidence |
+| X-03 | Medium | SF missing alts resolved or accepted |
+| X-04 | Low | SF “opportunity” length warnings triaged (not all must fail) |
+| X-05 | Low | SF security header warnings documented (default: Low / ignore for SEO unless user wants them) |
+| X-06 | Medium | Low-content pages from SF reviewed (thin templates vs intentional) |
+| X-07 | High | If PSI attached: document Performance + SEO category scores in Evidence for P-07 / summary |
+| X-08 | Medium | If PSI attached: CWV lab metrics noted (LCP/CLS/INP if present) |
+
+---
+
+## Counts
+
+- Checklist areas 1–15: **61** rules (T–B)  
+- Attachment extras: **8** rules (X)  
+- **Total: 69 rules**
+
+Always evaluate all rows. Use `n/a` / `unknown` rather than skipping.
+</pre>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-T" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Titles &amp; meta descriptions">
+    <label class="method-pop-backdrop" for="modal-area-T" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>1. Titles &amp; meta descriptions</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-T">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Titles and meta descriptions are the primary snippets search engines show in results. Weak, missing, or duplicated copy reduces click-through and makes pages harder to distinguish in the index.</p>
+        <h4>How to fix</h4>
+        <p>Give every indexable template a unique <code>&lt;title&gt;</code> and meta description, keep lengths in a readable range (~30–60 / ~70–155 chars), and wire CMS or front-matter fields so pages are not stuck on empty defaults.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-C" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Crawlability &amp; indexability">
+    <label class="method-pop-backdrop" for="modal-area-C" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>2. Crawlability &amp; indexability</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-C">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>If crawlers cannot fetch or are told not to index important URLs, rankings and discovery fail regardless of on-page quality.</p>
+        <h4>How to fix</h4>
+        <p>Ship a production <code>robots.txt</code> that does not blanket-disallow the site, publish an XML sitemap (and reference it with <code>Sitemap:</code>), keep <code>noindex</code> only on intentional pages, and exclude drafts from the live sitemap.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-N" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Canonical URLs">
+    <label class="method-pop-backdrop" for="modal-area-N" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>3. Canonical URLs</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-N">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Canonicals consolidate duplicate URL variants (www/apex, trailing slash, parameters) so ranking signals and indexing land on one preferred URL.</p>
+        <h4>How to fix</h4>
+        <p>Emit a self-referencing <code>rel=canonical</code> on page templates, align <code>baseURL</code> / site config with the live host, and keep host and trailing-slash policy consistent across links and tags.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-M" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Mobile-first basics">
+    <label class="method-pop-backdrop" for="modal-area-M" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>4. Mobile-first basics</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-M">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Google indexes with a mobile-first crawler. Broken viewports or desktop-only shells hurt usability signals and how content is understood on small screens.</p>
+        <h4>How to fix</h4>
+        <p>Include <code>meta name="viewport"</code>, use responsive layout for main content, and provide usable mobile navigation with adequate touch targets.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-P" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Performance / CWV readiness">
+    <label class="method-pop-backdrop" for="modal-area-P" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>5. Performance / CWV readiness</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-P">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Slow LCP, layout shift, and blocked rendering reduce engagement and can weigh against rankings. Lab CWV from PSI/Unlighthouse makes the gaps concrete.</p>
+        <h4>How to fix</h4>
+        <p>Do not lazy-load the LCP image, compress oversized assets, trim heavy head scripts, load fonts without FOIT where possible, and attach PSI when available to track Performance / CWV scores.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-H" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="HTTPS / host">
+    <label class="method-pop-backdrop" for="modal-area-H" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>6. HTTPS / host</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-H">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Secure HTTPS is a baseline trust and ranking expectation. Mixed content and insecure absolute URLs break assets and confuse crawlers.</p>
+        <h4>How to fix</h4>
+        <p>Serve the production site on <code>https</code>, make absolute asset and OG URLs https, and avoid protocol-relative <code>//</code> resource URLs.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-S" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Semantic HTML &amp; headings">
+    <label class="method-pop-backdrop" for="modal-area-S" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>7. Semantic HTML &amp; headings</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-S">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Clear document language, a single primary H1, and logical heading hierarchy help crawlers and assistive tech understand page structure and topic.</p>
+        <h4>How to fix</h4>
+        <p>Set <code>lang</code> on <code>&lt;html&gt;</code>, use one H1 per page type, keep heading order sensible, and include <code>&lt;main&gt;</code> plus header/nav landmarks.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-I" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Image SEO">
+    <label class="method-pop-backdrop" for="modal-area-I" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>8. Image SEO</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-I">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Alt text makes images understandable for search and accessibility. Missing alts lose Image Search relevance and create accessibility failures.</p>
+        <h4>How to fix</h4>
+        <p>Ensure image components support <code>alt</code>, write meaningful alts for content images, use empty alt for decorative images, and prefer modern formats (WebP/AVIF) when the pipeline allows.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-J" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="JSON-LD structured data">
+    <label class="method-pop-backdrop" for="modal-area-J" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>9. JSON-LD structured data</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-J">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>JSON-LD clarifies entities (Organization, WebSite, Article, breadcrumbs) for rich results and machine understanding. Crawlers often miss this if you only look at HTML text.</p>
+        <h4>How to fix</h4>
+        <p>Add valid <code>application/ld+json</code> that matches visible content—at least Organization or WebSite sitewide, Article on article templates, and BreadcrumbList when the IA is multi-level.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-U" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Clean URL structure">
+    <label class="method-pop-backdrop" for="modal-area-U" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>10. Clean URL structure</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-U">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Readable, stable URLs and fewer redirect hops preserve crawl budget and link equity and make sharing clearer.</p>
+        <h4>How to fix</h4>
+        <p>Use readable slugs, limit alias sprawl, point internal links at final URLs (not redirect chains), and avoid unnecessary query-param variants in primary navigation.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-L" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Internal linking">
+    <label class="method-pop-backdrop" for="modal-area-L" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>11. Internal linking</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-L">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Internal links distribute authority, help discovery of key pages, and give crawlers meaningful anchor context.</p>
+        <h4>How to fix</h4>
+        <p>Link money pages from primary nav, cover utilities in footer/secondary nav, use accessible anchor text (not empty links), and reduce obvious orphans where detectable.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-O" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Open Graph / Twitter cards">
+    <label class="method-pop-backdrop" for="modal-area-O" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>12. Open Graph / Twitter cards</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-O">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>OG and Twitter tags control how URLs look when shared on social and chat surfaces—often the first brand impression outside SERPs.</p>
+        <h4>How to fix</h4>
+        <p>Set <code>og:title</code>, <code>og:description</code>, and <code>og:image</code> (page or site default), plus <code>og:url</code> / <code>og:type</code> and <code>twitter:card</code>, keeping Twitter fields aligned with OG.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-E" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Status codes &amp; error UX">
+    <label class="method-pop-backdrop" for="modal-area-E" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>13. Status codes &amp; error UX</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-E">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Correct status codes and a real 404 experience prevent soft-404s, wasted crawl budget, and dead ends for users and bots.</p>
+        <h4>How to fix</h4>
+        <p>Ship a custom 404 (or framework not-found) page, avoid thin error content returning 200, and triage endemic internal 4xx / broken links from crawl exports.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-R" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="International / hreflang">
+    <label class="method-pop-backdrop" for="modal-area-R" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>14. International / hreflang</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-R">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>On multilingual sites, hreflang tells search engines which language/region variant to show and reduces duplicate-content confusion across locales.</p>
+        <h4>How to fix</h4>
+        <p>If multilingual: implement reciprocal hreflang (or equivalent) and <code>x-default</code>. If single-language: mark these checks <code>n/a</code> and avoid bogus hreflang in the sitemap.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-B" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Crawl-budget polish">
+    <label class="method-pop-backdrop" for="modal-area-B" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>15. Crawl-budget polish</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-B">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Low-value taxonomies, facet URLs, and noisy prefetch patterns waste crawl budget that should go to money pages.</p>
+        <h4>How to fix</h4>
+        <p>Noindex or disable thin tags/taxonomies, avoid heavily linking irrelevant filters, and do not abuse preconnect/prefetch on every third party.</p>
+      </div>
+    </div>
+  </div>
+
+  <input type="checkbox" id="modal-area-X" class="method-modal-toggle" />
+  <div class="method-modal" role="dialog" aria-label="Attachment-driven / SF extras">
+    <label class="method-pop-backdrop" for="modal-area-X" aria-label="Close"></label>
+    <div class="method-pop-panel">
+      <div class="skill-file-head area-guide-head">
+        <h3>Attachment-driven / SF extras</h3>
+        <div class="skill-file-actions">
+          <button type="button" class="method-pop-copy">Copy</button>
+          <label class="method-pop-close" for="modal-area-X">Close</label>
+        </div>
+      </div>
+      <div class="area-guide-body">
+        <h4>Why it matters</h4>
+        <p>Screaming Frog Issues and PageSpeed exports are independent evidence. Leaving Critical/High crawl issues or poor PSI scores unexplained means the audit ignored measured reality.</p>
+        <h4>How to fix</h4>
+        <p>When SF/PSI attachments are present, map Critical/High issues into matching rules, triage duplicates/alts/thin pages, and document Performance + SEO category scores and CWV lab metrics in Evidence. Without attachments, mark these checks <code>unknown</code> or <code>n/a</code> as noted in rules.md.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1>Technical SEO Audit</h1>
+        </div>
+      </div>
+      <dl class="meta-grid">
+        <div class="meta-item">
+          <dt>Date</dt>
+          <dd>2026-07-27 06:50 (CEST)</dd>
+        </div>
+        <div class="meta-item">
+          <dt>Commit</dt>
+          <dd><a class="commit-link" href="https://github.com/example/site/commit/a1b2c3d4e5f67890" target="_blank" rel="noopener">a1b2c3d</a></dd>
+        </div>
+      </dl>
+      <div class="method">
+        <div class="method-line">A <span>handoff.md</span> (mock — not generated) was generated so agents can fix the failed and partial issues.</div>
+        <!-- Keep this sentence on ONE line in the generated HTML (labels only — no block tags). -->
+        <div class="method-line">This report was generated based on analysis performed by Cursor (Composer) using the <label class="method-link" for="modal-skill">skill</label> and <label class="method-link" for="modal-rules">rules</label> over static site files, and the following attachments:</div>
+        <ul class="attachment-list">
+          <!-- If none: <li class="none">None provided.</li> -->
+          <li class="none">None provided.</li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- 1) Summary card: pass rate + totals only -->
+    <section class="card summary">
+      <h2>Summary</h2>
+      <div class="summary-hero">
+        <div class="pass-rate score-average">
+          <div class="score-gauge" role="img" aria-label="Pass rate 65 percent">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="score-track" cx="60" cy="60" r="52" pathLength="100" />
+              <circle class="score-fill" cx="60" cy="60" r="52" pathLength="100"
+                stroke-dasharray="65 100" />
+            </svg>
+            <div class="score-center">
+              <span class="pass-rate-value">65%</span>
+            </div>
+          </div>
+          <div class="pass-rate-label">
+            <span class="pass-rate-fraction">42 succ. / 65 total</span>
+            <span class="pass-rate-pct">65% pass rate</span>
+          </div>
+        </div>
+        <div class="stat-tiles">
+          <!-- onclick switches to By priority so the target section is visible -->
+          <a class="stat-tile stat-fail" href="#prio-high-fail" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">8</span>
+            <span class="stat-label">Failed</span>
+          </a>
+          <a class="stat-tile stat-partial" href="#prio-high-partial" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">12</span>
+            <span class="stat-label">Partial</span>
+          </a>
+          <a class="stat-tile stat-pass" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">42</span>
+            <span class="stat-label">Passed</span>
+          </a>
+          <a class="stat-tile stat-unknown" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">3</span>
+            <span class="stat-label">Unknown</span>
+          </a>
+          <a class="stat-tile stat-na" href="#prio-passed" onclick="document.getElementById('view-tab-priority').checked=true">
+            <span class="stat-num">4</span>
+            <span class="stat-label">N/A</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2) View switch: drives Overview + issue list sorting -->
+    <div class="view-switch">
+      <input type="radio" name="audit-view" id="view-tab-priority" checked />
+      <input type="radio" name="audit-view" id="view-tab-rule" />
+      <div class="summary-tablist" role="tablist" aria-label="Issue sorting">
+        <label class="summary-tab" for="view-tab-priority" role="tab">By priority</label>
+        <label class="summary-tab" for="view-tab-rule" role="tab">By rule</label>
+      </div>
+
+      <!-- ===== BY PRIORITY ===== -->
+      <div class="view-panel view-panel-priority">
+        <section class="card overview">
+          <h2>Overview</h2>
+          <table class="priority-summary">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Failed</th>
+                <th>Partial</th>
+                <th>Passed</th>
+                <th>Unknown</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>High</td>
+                <td><a class="count count-fail" href="#prio-high-fail">5</a></td>
+                <td><a class="count count-partial" href="#prio-high-partial">3</a></td>
+                <td><a class="count count-pass" href="#prio-passed">18</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">1</a></td>
+                <td><a class="count count-na" href="#prio-passed">1</a></td>
+              </tr>
+              <tr>
+                <td>Medium</td>
+                <td><a class="count count-fail" href="#prio-medium-fail">2</a></td>
+                <td><a class="count count-partial" href="#prio-medium-partial">6</a></td>
+                <td><a class="count count-pass" href="#prio-passed">16</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">1</a></td>
+                <td><a class="count count-na" href="#prio-passed">1</a></td>
+              </tr>
+              <tr>
+                <td>Low</td>
+                <td><a class="count count-fail" href="#prio-low-fail">1</a></td>
+                <td><a class="count count-partial" href="#prio-low-partial">3</a></td>
+                <td><a class="count count-pass" href="#prio-passed">8</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">1</a></td>
+                <td><a class="count count-na" href="#prio-passed">2</a></td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td><a class="count count-fail" href="#prio-high-fail">8</a></td>
+                <td><a class="count count-partial" href="#prio-high-partial">12</a></td>
+                <td><a class="count count-pass" href="#prio-passed">42</a></td>
+                <td><a class="count count-unknown" href="#prio-passed">3</a></td>
+                <td><a class="count count-na" href="#prio-passed">4</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!--
+          Priority issue list anchors:
+          #prio-high-fail #prio-high-partial
+          #prio-medium-fail #prio-medium-partial
+          #prio-low-fail #prio-low-partial
+          #prio-passed
+        -->
+        
+<div id="prio-high-fail" class="result-group">
+  <p class="section-label">High — Failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">T-02</span>
+    <span class="rule-title">Titles are unique across key pages</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Duplicate titles collapse distinct pages in SERPs.</p>
+    <h4>Evidence</h4>
+    <p>layouts/_default/baseof.html uses a single sitewide title string for blog posts.</p>
+    <h4>How to fix</h4>
+    <p>Add per-page title templates from front matter.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">C-03</span>
+    <span class="rule-title">robots.txt references sitemap via Sitemap:</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Without Sitemap:, discovery of new URLs is slower.</p>
+    <h4>Evidence</h4>
+    <p>static/robots.txt has no Sitemap: line.</p>
+    <h4>How to fix</h4>
+    <p>Add Sitemap: https://example.com/sitemap.xml</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">J-01</span>
+    <span class="rule-title">JSON-LD Organization or WebSite present</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Structured data clarifies brand entity for rich results.</p>
+    <h4>Evidence</h4>
+    <p>No application/ld+json found in layouts.</p>
+    <h4>How to fix</h4>
+    <p>Add Organization + WebSite JSON-LD to the base layout.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">I-02</span>
+    <span class="rule-title">Meaningful images don’t systematically omit alt</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Missing alts hurt accessibility and image search.</p>
+    <h4>Evidence</h4>
+    <p>Mock SF: 14 images Missing Alt Text on /blog/*.</p>
+    <h4>How to fix</h4>
+    <p>Require alt on content image shortcodes.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">O-03</span>
+    <span class="rule-title">og:image present</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Shares without images look untrusted.</p>
+    <h4>Evidence</h4>
+    <p>og:image missing on product templates.</p>
+    <h4>How to fix</h4>
+    <p>Set a default OG image and page overrides.</p>
+  </div>
+</details>
+</div>
+<div id="prio-high-partial" class="result-group">
+  <p class="section-label">High — Partially failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">T-05</span>
+    <span class="rule-title">Meta description present on indexable page types</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Empty descriptions weaken snippets.</p>
+    <h4>Evidence</h4>
+    <p>About and Pricing have descriptions; blog index does not.</p>
+    <h4>How to fix</h4>
+    <p>Add description fields to remaining templates.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">L-01</span>
+    <span class="rule-title">Primary nav links to key money pages</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Money pages need crawl paths from global nav.</p>
+    <h4>Evidence</h4>
+    <p>/pricing linked; /demo only in footer.</p>
+    <h4>How to fix</h4>
+    <p>Add Demo to primary nav.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">N-01</span>
+    <span class="rule-title">Self-referencing rel=canonical on page templates</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Most pages OK; homepage canonical points to staging host.</p>
+    <h4>Evidence</h4>
+    <p>layouts/index.html canonical uses staging.example.com</p>
+    <h4>How to fix</h4>
+    <p>Point canonical to production host.</p>
+  </div>
+</details>
+</div>
+<div id="prio-medium-fail" class="result-group">
+  <p class="section-label">Medium — Failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">S-03</span>
+    <span class="rule-title">Heading hierarchy logical</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Chaotic skips hurt extractability.</p>
+    <h4>Evidence</h4>
+    <p>Blog posts jump H1 → H3 sitewide.</p>
+    <h4>How to fix</h4>
+    <p>Enforce H2 between H1 and H3 in content guidelines.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">X-01</span>
+    <span class="rule-title">SF Critical/High issues reviewed and mapped</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Unmapped crawl issues leave measured problems unexplained.</p>
+    <h4>Evidence</h4>
+    <p>Mock SF CSV lists Critical: redirect chains on /docs/*.</p>
+    <h4>How to fix</h4>
+    <p>Map each Critical/High SF issue into a rule with evidence.</p>
+  </div>
+</details>
+</div>
+<div id="prio-medium-partial" class="result-group">
+  <p class="section-label">Medium — Partially failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">P-03</span>
+    <span class="rule-title">Oversized images avoided or compressed</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Large heroes slow LCP.</p>
+    <h4>Evidence</h4>
+    <p>Mock SF: 6 images over 300kB on homepage.</p>
+    <h4>How to fix</h4>
+    <p>Compress and serve WebP for hero assets.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">P-04</span>
+    <span class="rule-title">Heavy third-party scripts in head minimized</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Blocking scripts delay rendering.</p>
+    <h4>Evidence</h4>
+    <p>Two analytics tags in head; one can move to body end.</p>
+    <h4>How to fix</h4>
+    <p>Defer non-critical scripts.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">T-04</span>
+    <span class="rule-title">Titles avoid being extremely long</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Long titles truncate in SERPs.</p>
+    <h4>Evidence</h4>
+    <p>3 marketing pages over 70 chars.</p>
+    <h4>How to fix</h4>
+    <p>Shorten titles to about 60 characters.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">U-01</span>
+    <span class="rule-title">Readable slugs / paths</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>A few legacy IDs remain.</p>
+    <h4>Evidence</h4>
+    <p>/p?id=442 still linked from older posts.</p>
+    <h4>How to fix</h4>
+    <p>Redirect to clean slugs.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">I-04</span>
+    <span class="rule-title">Linked images without text have alt or accessible name</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Icon-only links need names.</p>
+    <h4>Evidence</h4>
+    <p>Footer social icons lack aria-label.</p>
+    <h4>How to fix</h4>
+    <p>Add aria-label or alt text.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">E-03</span>
+    <span class="rule-title">Broken internal links not endemic</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>A small cluster of 404s remains.</p>
+    <h4>Evidence</h4>
+    <p>Mock SF: 4 internal 404s under /guides/.</p>
+    <h4>How to fix</h4>
+    <p>Fix or remove broken links.</p>
+  </div>
+</details>
+</div>
+<div id="prio-low-fail" class="result-group">
+  <p class="section-label">Low — Failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">S-06</span>
+    <span class="rule-title">Duplicate sitewide H2 boilerplate avoided</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Repeated H2s dilute topical signals.</p>
+    <h4>Evidence</h4>
+    <p>Every page footer uses the same H2 “Resources”.</p>
+    <h4>How to fix</h4>
+    <p>Change footer heading to a non-H2 or unique copy.</p>
+  </div>
+</details>
+</div>
+<div id="prio-low-partial" class="result-group">
+  <p class="section-label">Low — Partially failed</p>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">T-08</span>
+    <span class="rule-title">Meta descriptions not extremely short on key marketing pages</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Very short descriptions underuse the snippet.</p>
+    <h4>Evidence</h4>
+    <p>/features description is 48 chars.</p>
+    <h4>How to fix</h4>
+    <p>Expand to about 120 characters.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">P-06</span>
+    <span class="rule-title">Preconnect/preload used for critical origins</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Font origin lacks preconnect.</p>
+    <h4>Evidence</h4>
+    <p>fonts.gstatic.com loaded without preconnect.</p>
+    <h4>How to fix</h4>
+    <p>Add preconnect for the font CDN.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">B-02</span>
+    <span class="rule-title">Prefetch/preconnect not abused on every third party</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Too many hints waste bandwidth.</p>
+    <h4>Evidence</h4>
+    <p>7 preconnects on every page.</p>
+    <h4>How to fix</h4>
+    <p>Keep only critical origins.</p>
+  </div>
+</details>
+</div>
+<details id="prio-passed" class="passed-block">
+  <summary class="group">Passed, N/A &amp; unknown (42 passed · 3 unknown · 4 N/A)</summary>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">H-01</span>
+    <span class="rule-title">Production site URL uses https</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>HTTPS is baseline trust.</p>
+    <h4>Evidence</h4>
+    <p>All absolute URLs use https://example.com.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">M-01</span>
+    <span class="rule-title">meta name=viewport present</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Required for mobile-first indexing.</p>
+    <h4>Evidence</h4>
+    <p>Present in base layout.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-unknown">unknown</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">P-07</span>
+    <span class="rule-title">PSI Performance not in poor band</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Needs live lab data.</p>
+    <h4>Evidence</h4>
+    <p>No PSI attachment in this mock run.</p>
+    <h4>How to fix</h4>
+    <p>Attach a PSI export on the next audit.</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-na">na</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">R-01</span>
+    <span class="rule-title">hreflang present if multilingual</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Single-language site.</p>
+    <h4>Evidence</h4>
+    <p>Only en content; no locale variants.</p>
+    <h4>How to fix</h4>
+    <p>n/a</p>
+  </div>
+</details>
+  <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">C-01</span>
+    <span class="rule-title">robots.txt exists and does not Disallow: /</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Crawl access is open.</p>
+    <h4>Evidence</h4>
+    <p>static/robots.txt allows /.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+</details>
+
+      </div>
+
+      <!-- ===== BY RULE ===== -->
+      <div class="view-panel view-panel-rule">
+        <section class="card overview">
+          <h2>Overview</h2>
+          <!--
+            Fixed order from rules.md (1–15) + Attachment-driven / SF extras.
+            Rule area names open hardcoded Why / How to fix dialogs (modal-area-*).
+            Count cells link to #area-T … #area-X (Total → first area with fails, or #area-T).
+            Each count placeholder is a full cell value: <a class="count …"> or <span class="count count-zero">0</span>.
+          -->
+          <table class="priority-summary rule-summary">
+            <thead>
+              <tr>
+                <th>Rule area</th>
+                <th>Failed</th>
+                <th>Partial</th>
+                <th>Passed</th>
+                <th>Unknown</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="area-num">1.</span> <label class="method-link" for="modal-area-T">Titles &amp; meta descriptions</label></td>
+                <td><a class="count count-fail" href="#area-T">1</a></td>
+                <td><a class="count count-partial" href="#area-T">2</a></td>
+                <td><a class="count count-pass" href="#area-T">5</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">2.</span> <label class="method-link" for="modal-area-C">Crawlability &amp; indexability</label></td>
+                <td><a class="count count-fail" href="#area-C">1</a></td>
+                <td><a class="count count-partial" href="#area-C">1</a></td>
+                <td><a class="count count-pass" href="#area-C">3</a></td>
+                <td><a class="count count-unknown" href="#area-C">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">3.</span> <label class="method-link" for="modal-area-N">Canonical URLs</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-pass" href="#area-N">4</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">4.</span> <label class="method-link" for="modal-area-M">Mobile-first basics</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-pass" href="#area-M">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">5.</span> <label class="method-link" for="modal-area-P">Performance / CWV readiness</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-partial" href="#area-P">3</a></td>
+                <td><a class="count count-pass" href="#area-P">2</a></td>
+                <td><a class="count count-unknown" href="#area-P">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">6.</span> <label class="method-link" for="modal-area-H">HTTPS / host</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-pass" href="#area-H">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">7.</span> <label class="method-link" for="modal-area-S">Semantic HTML &amp; headings</label></td>
+                <td><a class="count count-fail" href="#area-S">1</a></td>
+                <td><a class="count count-partial" href="#area-S">1</a></td>
+                <td><a class="count count-pass" href="#area-S">4</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">8.</span> <label class="method-link" for="modal-area-I">Image SEO</label></td>
+                <td><a class="count count-fail" href="#area-I">1</a></td>
+                <td><a class="count count-partial" href="#area-I">2</a></td>
+                <td><a class="count count-pass" href="#area-I">2</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">9.</span> <label class="method-link" for="modal-area-J">JSON-LD structured data</label></td>
+                <td><a class="count count-fail" href="#area-J">1</a></td>
+                <td><a class="count count-partial" href="#area-J">1</a></td>
+                <td><a class="count count-pass" href="#area-J">2</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">10.</span> <label class="method-link" for="modal-area-U">Clean URL structure</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-partial" href="#area-U">1</a></td>
+                <td><a class="count count-pass" href="#area-U">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">11.</span> <label class="method-link" for="modal-area-L">Internal linking</label></td>
+                <td><a class="count count-fail" href="#area-L">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-pass" href="#area-L">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">12.</span> <label class="method-link" for="modal-area-O">Open Graph / Twitter cards</label></td>
+                <td><a class="count count-fail" href="#area-O">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-pass" href="#area-O">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">13.</span> <label class="method-link" for="modal-area-E">Status codes &amp; error UX</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-partial" href="#area-E">1</a></td>
+                <td><a class="count count-pass" href="#area-E">2</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-na" href="#area-E">1</a></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">14.</span> <label class="method-link" for="modal-area-R">International / hreflang</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-na" href="#area-R">3</a></td>
+              </tr>
+              <tr>
+                <td><span class="area-num">15.</span> <label class="method-link" for="modal-area-B">Crawl-budget polish</label></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-pass" href="#area-B">3</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr>
+                <td><label class="method-link" for="modal-area-X">Attachment-driven / SF extras</label></td>
+                <td><a class="count count-fail" href="#area-X">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><span class="count count-zero">0</span></td>
+                <td><a class="count count-unknown" href="#area-X">1</a></td>
+                <td><span class="count count-zero">0</span></td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td><a class="count count-fail" href="#area-T">8</a></td>
+                <td><a class="count count-partial" href="#area-T">12</a></td>
+                <td><a class="count count-pass" href="#area-T">42</a></td>
+                <td><a class="count count-unknown" href="#area-T">3</a></td>
+                <td><a class="count count-na" href="#area-T">4</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!--
+          Rule issue list: one .area-group per area in fixed order.
+          Anchors: #area-T #area-C … #area-B #area-X
+          Structure:
+            <div id="area-T" class="result-group area-group">
+              <p class="section-label">1. Titles…</p>
+              <div class="area-body">
+                fail/partial rules…
+                <details class="passed-block">Passed, N/A & unknown…</details>
+              </div>
+            </div>
+        -->
+        
+<div id="area-T" class="result-group area-group">
+  <p class="section-label">1. Titles & meta descriptions</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">T-02</span>
+    <span class="rule-title">Titles are unique across key pages</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Duplicates collapse SERP differentiation.</p>
+    <h4>Evidence</h4>
+    <p>Blog posts share one title pattern.</p>
+    <h4>How to fix</h4>
+    <p>Use unique front-matter titles.</p>
+  </div>
+</details><details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">T-05</span>
+    <span class="rule-title">Meta description present on indexable page types</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Gaps weaken snippets.</p>
+    <h4>Evidence</h4>
+    <p>Blog index missing description.</p>
+    <h4>How to fix</h4>
+    <p>Add descriptions to remaining templates.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (5 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">T-01</span>
+    <span class="rule-title">Every indexable page type has a title template</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Titles exist.</p>
+    <h4>Evidence</h4>
+    <p>baseof.html has title block.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-C" class="result-group area-group">
+  <p class="section-label">2. Crawlability & indexability</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">C-03</span>
+    <span class="rule-title">robots.txt references sitemap via Sitemap:</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Speeds discovery.</p>
+    <h4>Evidence</h4>
+    <p>No Sitemap: line.</p>
+    <h4>How to fix</h4>
+    <p>Add Sitemap: URL.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 1 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">C-01</span>
+    <span class="rule-title">robots.txt exists and does not Disallow: /</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Crawl open.</p>
+    <h4>Evidence</h4>
+    <p>Allows /.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details><details class="rule">
+  <summary>
+    <span class="badge badge-unknown">unknown</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">C-05</span>
+    <span class="rule-title">Draft content not in production sitemap</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Needs crawl confirmation.</p>
+    <h4>Evidence</h4>
+    <p>Not verified in this mock.</p>
+    <h4>How to fix</h4>
+    <p>Re-check with live sitemap.</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-N" class="result-group area-group">
+  <p class="section-label">3. Canonical URLs</p>
+  <div class="area-body">
+    
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (4 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">N-01</span>
+    <span class="rule-title">Self-referencing rel=canonical</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Mostly good.</p>
+    <h4>Evidence</h4>
+    <p>Present on templates.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-M" class="result-group area-group">
+  <p class="section-label">4. Mobile-first basics</p>
+  <div class="area-body">
+    
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">M-01</span>
+    <span class="rule-title">meta viewport present</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK.</p>
+    <h4>Evidence</h4>
+    <p>In base layout.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-P" class="result-group area-group">
+  <p class="section-label">5. Performance / CWV readiness</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">P-03</span>
+    <span class="rule-title">Oversized images avoided or compressed</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Large heroes hurt LCP.</p>
+    <h4>Evidence</h4>
+    <p>6 images over 300kB.</p>
+    <h4>How to fix</h4>
+    <p>Compress heroes.</p>
+  </div>
+</details><details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">P-04</span>
+    <span class="rule-title">Heavy third-party scripts minimized</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Blocking scripts delay render.</p>
+    <h4>Evidence</h4>
+    <p>Two tags in head.</p>
+    <h4>How to fix</h4>
+    <p>Defer non-critical scripts.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (2 passed · 1 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-unknown">unknown</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">P-07</span>
+    <span class="rule-title">PSI Performance band</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>No PSI attached.</p>
+    <h4>Evidence</h4>
+    <p>unknown</p>
+    <h4>How to fix</h4>
+    <p>Attach PSI next run.</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-H" class="result-group area-group">
+  <p class="section-label">6. HTTPS / host</p>
+  <div class="area-body">
+    
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">H-01</span>
+    <span class="rule-title">Production uses https</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK.</p>
+    <h4>Evidence</h4>
+    <p>https://example.com</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-S" class="result-group area-group">
+  <p class="section-label">7. Semantic HTML & headings</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">S-03</span>
+    <span class="rule-title">Heading hierarchy logical</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Skips hurt structure.</p>
+    <h4>Evidence</h4>
+    <p>H1 to H3 jumps on blog.</p>
+    <h4>How to fix</h4>
+    <p>Insert H2s.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (4 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">S-02</span>
+    <span class="rule-title">One primary h1 pattern</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK on marketing pages.</p>
+    <h4>Evidence</h4>
+    <p>Single H1 in templates.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-I" class="result-group area-group">
+  <p class="section-label">8. Image SEO</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">I-02</span>
+    <span class="rule-title">Meaningful images don’t omit alt</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Alts matter for a11y/search.</p>
+    <h4>Evidence</h4>
+    <p>14 missing alts in SF mock.</p>
+    <h4>How to fix</h4>
+    <p>Require alt on shortcodes.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (2 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">I-03</span>
+    <span class="rule-title">Decorative images can use empty alt</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Supported.</p>
+    <h4>Evidence</h4>
+    <p>Component allows empty alt.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-J" class="result-group area-group">
+  <p class="section-label">9. JSON-LD structured data</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">J-01</span>
+    <span class="rule-title">JSON-LD Organization or WebSite present</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Entity clarity for rich results.</p>
+    <h4>Evidence</h4>
+    <p>No JSON-LD in layouts.</p>
+    <h4>How to fix</h4>
+    <p>Add Organization + WebSite.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (2 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">J-04</span>
+    <span class="rule-title">BreadcrumbList where multi-level IA</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Partial site depth.</p>
+    <h4>Evidence</h4>
+    <p>Present on docs.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-U" class="result-group area-group">
+  <p class="section-label">10. Clean URL structure</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">U-01</span>
+    <span class="rule-title">Readable slugs / paths</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Legacy IDs remain.</p>
+    <h4>Evidence</h4>
+    <p>/p?id=442 still linked.</p>
+    <h4>How to fix</h4>
+    <p>Redirect to clean slugs.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">U-03</span>
+    <span class="rule-title">Internal links prefer final URLs</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Mostly clean.</p>
+    <h4>Evidence</h4>
+    <p>Few redirects left.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-L" class="result-group area-group">
+  <p class="section-label">11. Internal linking</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">L-01</span>
+    <span class="rule-title">Primary nav links to key money pages</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Demo only in footer.</p>
+    <h4>Evidence</h4>
+    <p>/demo missing from primary nav.</p>
+    <h4>How to fix</h4>
+    <p>Add Demo to nav.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">L-02</span>
+    <span class="rule-title">Footer covers utility pages</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK.</p>
+    <h4>Evidence</h4>
+    <p>Contact/Privacy linked.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-O" class="result-group area-group">
+  <p class="section-label">12. Open Graph / Twitter cards</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">O-03</span>
+    <span class="rule-title">og:image present</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Shares need images.</p>
+    <h4>Evidence</h4>
+    <p>Missing on product templates.</p>
+    <h4>How to fix</h4>
+    <p>Set default OG image.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">O-01</span>
+    <span class="rule-title">og:title present</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK.</p>
+    <h4>Evidence</h4>
+    <p>Set sitewide.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-E" class="result-group area-group">
+  <p class="section-label">13. Status codes & error UX</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-partial">partial</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">E-03</span>
+    <span class="rule-title">Broken internal links not endemic</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Small 404 cluster.</p>
+    <h4>Evidence</h4>
+    <p>4 internal 404s under /guides/.</p>
+    <h4>How to fix</h4>
+    <p>Fix links.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (2 passed · 0 unknown · 1 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">E-01</span>
+    <span class="rule-title">Custom 404 exists</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>OK.</p>
+    <h4>Evidence</h4>
+    <p>layouts/404.html</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details><details class="rule">
+  <summary>
+    <span class="badge badge-na">na</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">E-04</span>
+    <span class="rule-title">External 4xx reviewed</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Out of scope for mock.</p>
+    <h4>Evidence</h4>
+    <p>n/a</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-R" class="result-group area-group">
+  <p class="section-label">14. International / hreflang</p>
+  <div class="area-body">
+    
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (0 passed · 0 unknown · 3 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-na">na</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">R-01</span>
+    <span class="rule-title">hreflang if multilingual</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Single language.</p>
+    <h4>Evidence</h4>
+    <p>n/a</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details><details class="rule">
+  <summary>
+    <span class="badge badge-na">na</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">R-02</span>
+    <span class="rule-title">x-default if multilingual</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>n/a</p>
+    <h4>Evidence</h4>
+    <p>n/a</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details><details class="rule">
+  <summary>
+    <span class="badge badge-na">na</span>
+    <span class="prio prio-low">low</span>
+    <span class="badge badge-id">R-03</span>
+    <span class="rule-title">No bogus hreflang for monolingual</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>n/a</p>
+    <h4>Evidence</h4>
+    <p>n/a</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-B" class="result-group area-group">
+  <p class="section-label">15. Crawl-budget polish</p>
+  <div class="area-body">
+    
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (3 passed · 0 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-pass">pass</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">B-01</span>
+    <span class="rule-title">Thin taxonomies disabled or noindexed</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Tags noindexed.</p>
+    <h4>Evidence</h4>
+    <p>taxonomy config OK.</p>
+    <h4>How to fix</h4>
+    <p>—</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+
+<div id="area-X" class="result-group area-group">
+  <p class="section-label">Attachment-driven / SF extras</p>
+  <div class="area-body">
+    <details class="rule">
+  <summary>
+    <span class="badge badge-fail">fail</span>
+    <span class="prio prio-medium">medium</span>
+    <span class="badge badge-id">X-01</span>
+    <span class="rule-title">SF Critical/High issues reviewed and mapped</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>Unmapped crawl issues.</p>
+    <h4>Evidence</h4>
+    <p>Redirect chains on /docs/*.</p>
+    <h4>How to fix</h4>
+    <p>Map SF Critical/High into rules.</p>
+  </div>
+</details>
+    <details class="passed-block">
+      <summary class="group">Passed, N/A &amp; unknown (0 passed · 1 unknown · 0 N/A)</summary>
+      <details class="rule">
+  <summary>
+    <span class="badge badge-unknown">unknown</span>
+    <span class="prio prio-high">high</span>
+    <span class="badge badge-id">X-07</span>
+    <span class="rule-title">PSI scores documented</span>
+  </summary>
+  <div class="body">
+    <h4>Why it matters</h4>
+    <p>No PSI in mock.</p>
+    <h4>Evidence</h4>
+    <p>unknown</p>
+    <h4>How to fix</h4>
+    <p>Attach PSI.</p>
+  </div>
+</details>
+    </details>
+  </div>
+</div>
+      </div>
+    </div>
+
+  </div>
+  <script>
+    (function () {
+      function applyOverviewRowColors() {
+        document.querySelectorAll("table.priority-summary tbody tr").forEach(function (tr) {
+          var cells = tr.querySelectorAll("td");
+          if (cells.length < 3) return;
+          var fail = parseInt((cells[1].textContent || "0").replace(/\s+/g, ""), 10);
+          var partial = parseInt((cells[2].textContent || "0").replace(/\s+/g, ""), 10);
+          if (isNaN(fail)) fail = 0;
+          if (isNaN(partial)) partial = 0;
+          tr.classList.remove("row-fail", "row-partial", "row-pass");
+          if (fail > 0) tr.classList.add("row-fail");
+          else if (partial > 0) tr.classList.add("row-partial");
+          else tr.classList.add("row-pass");
+        });
+      }
+      applyOverviewRowColors();
+
+      /* Open/close modals without focusing the checkbox (avoids scroll-to-top). */
+      document.addEventListener("click", function (e) {
+        var label = e.target.closest("label[for]");
+        if (!label) return;
+        var input = document.getElementById(label.getAttribute("for"));
+        if (!input || !input.classList.contains("method-modal-toggle")) return;
+        e.preventDefault();
+        var closes = label.classList.contains("method-pop-close") || label.classList.contains("method-pop-backdrop");
+        input.checked = !closes;
+      });
+
+      document.querySelectorAll(".method-pop-copy").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var panel = btn.closest(".method-pop-panel");
+          if (!panel) return;
+          var body = panel.querySelector(".skill-file-body, .area-guide-body");
+          if (!body) return;
+          var text = body.tagName === "PRE" ? body.textContent : body.innerText;
+          function done() {
+            var prev = btn.textContent;
+            btn.textContent = "Copied";
+            btn.classList.add("is-copied");
+            setTimeout(function () {
+              btn.textContent = prev;
+              btn.classList.remove("is-copied");
+            }, 1500);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(function () {
+              fallbackCopy(text, done);
+            });
+          } else {
+            fallbackCopy(text, done);
+          }
+        });
+      });
+
+      function fallbackCopy(text, done) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (err) {}
+        document.body.removeChild(ta);
+        done();
+      }
+    })();
+  </script>
+</body>
+</html>
