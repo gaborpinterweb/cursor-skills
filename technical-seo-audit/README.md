@@ -4,7 +4,7 @@ Audit-only Cursor skill: evaluates a static-site frontend against 60+ technical 
 
 ## When to use it
 
-Ask Cursor for a technical SEO audit, scorecard, or HTML audit report — especially when you can attach Screaming Frog Issues or PageSpeed exports.
+Ask Cursor for a technical SEO audit, scorecard, or HTML audit report — especially when you can attach [Screaming Frog](https://www.screamingfrog.co.uk/seo-spider/) Issues or PageSpeed exports.
 
 ## How it works
 
