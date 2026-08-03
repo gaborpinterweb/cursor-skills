@@ -4,7 +4,7 @@ description: >-
   Runs a technical Answer Engine Optimization (AEO) audit on a static-site
   frontend, evaluates ~47 rules across 10 checklist areas (plus Answerlint
   attachments), and writes a dated self-contained HTML report under
-  aeo-audit/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results,
+  reports/aeo/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results,
   attachments, and commit hash. Use when the user asks for an AEO audit, GEO
   audit, AI visibility / citation readiness scorecard, or Answerlint-based
   report.
@@ -35,7 +35,7 @@ Primary free attachment: [Answerlint](https://www.npmjs.com/package/answerlint) 
 Create (never reuse a folder name — each run gets its own directory):
 
 ```text
-aeo-audit/YYYY-MM-DD-HHmm/
+reports/aeo/YYYY-MM-DD-HHmm/
   index.html              # Main report (open this) — self-contained (CSS inlined)
   meta.json               # Machine-readable summary
   handoff.md              # For technical-aeo-implement
@@ -46,8 +46,8 @@ aeo-audit/YYYY-MM-DD-HHmm/
     <original-filename>
 ```
 
-- Always use **local date + time**: `aeo-audit/YYYY-MM-DD-HHmm/` (24h clock, zero-padded).
-- If that exact minute folder already exists, append seconds: `aeo-audit/YYYY-MM-DD-HHmmss/`.
+- Always use **local date + time**: `reports/aeo/YYYY-MM-DD-HHmm/` (24h clock, zero-padded).
+- If that exact minute folder already exists, append seconds: `reports/aeo/YYYY-MM-DD-HHmmss/`.
 - Resolve **git commit**: `git rev-parse --short HEAD` (and note dirty tree if `git status --porcelain` is non-empty). If not a git repo, set commit to `n/a`.
 - Resolve **commit URL** from `git remote get-url origin` (or first remote):
   - **GitHub** (`github.com`): `https://github.com/<owner>/<repo>/commit/<full-sha>`
@@ -60,7 +60,7 @@ aeo-audit/YYYY-MM-DD-HHmm/
 
 ## Workflow
 
-1. Create `aeo-audit/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
+1. Create `reports/aeo/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
 2. Copy all provided attachments into `attachments/` (preserve filenames). Record them in `meta.json` and the HTML header as links (`target="_blank"` `rel="noopener"`).
 3. Copy this skill’s `SKILL.md` and `rules.md` into `skill-sources/` (verbatim). Embed the same full text behind the clickable **skill** / **rules** words in the method line.
 4. Record `model` (Cursor model name) and `analysisScope` (`static site files` / `a live URL` / `static site files and a live URL`).
@@ -135,7 +135,7 @@ Generate implementation tasks only for `fail` and `partial` rules with priority 
 # AEO implement handoff — YYYY-MM-DD
 
 Commit: <hash>
-Report: aeo-audit/YYYY-MM-DD-HHmm/index.html
+Report: reports/aeo/YYYY-MM-DD-HHmm/index.html
 
 ## Tasks
 ### IMP-001 — <rule id> — <title>

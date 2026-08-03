@@ -3,7 +3,7 @@ name: technical-seo-audit
 description: >-
   Runs a technical SEO audit on a static-site frontend, evaluates 60+ rules
   (15 checklist areas + Screaming Frog Issues), and writes a dated HTML report
-  under audit/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results,
+  under reports/seo/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results,
   attachments, and commit hash. Use when the user asks for a technical SEO
   audit, SEO scorecard, or audit report.
 ---
@@ -31,7 +31,7 @@ Copy every user-attached audit artifact into the report folder (see below).
 Create (never reuse a folder name — each run gets its own directory):
 
 ```text
-audit/YYYY-MM-DD-HHmm/
+reports/seo/YYYY-MM-DD-HHmm/
   index.html              # Main report (open this) — self-contained (CSS inlined)
   meta.json               # Machine-readable summary
   handoff.md              # For technical-seo-implement
@@ -42,8 +42,8 @@ audit/YYYY-MM-DD-HHmm/
     <original-filename>
 ```
 
-- Always use **local date + time**: `audit/YYYY-MM-DD-HHmm/` (24h clock, zero-padded). Example: `audit/2026-07-24-1512/`.
-- If that exact minute folder already exists, append seconds: `audit/YYYY-MM-DD-HHmmss/`.
+- Always use **local date + time**: `reports/seo/YYYY-MM-DD-HHmm/` (24h clock, zero-padded). Example: `reports/seo/2026-07-24-1512/`.
+- If that exact minute folder already exists, append seconds: `reports/seo/YYYY-MM-DD-HHmmss/`.
 - Resolve **git commit**: `git rev-parse --short HEAD` (and note dirty tree if `git status --porcelain` is non-empty). If not a git repo, set commit to `n/a`.
 - Resolve **commit URL** from `git remote get-url origin` (or first remote):
   - **GitHub** (`github.com`): `https://github.com/<owner>/<repo>/commit/<full-sha>`
@@ -56,7 +56,7 @@ audit/YYYY-MM-DD-HHmm/
 
 ## Workflow
 
-1. Create `audit/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
+1. Create `reports/seo/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
 2. Copy all provided attachments into `attachments/` (preserve filenames). Record them in `meta.json` and the HTML header as links (`target="_blank"` `rel="noopener"`).
 3. Copy this skill’s `SKILL.md` and `rules.md` into `skill-sources/` (verbatim). Embed the same full text behind the clickable **skill** / **rules** words in the method line.
 4. Record `model` (Cursor model name) and `analysisScope` (`static site files` / `a live URL` / `static site files and a live URL`).
@@ -141,7 +141,7 @@ Generate implementation tasks only for `fail` and `partial` rules with priority 
 # SEO implement handoff — YYYY-MM-DD
 
 Commit: <hash>
-Report: audit/YYYY-MM-DD-HHmm/index.html
+Report: reports/seo/YYYY-MM-DD-HHmm/index.html
 
 ## Tasks
 ### IMP-001 — <rule id> — <title>

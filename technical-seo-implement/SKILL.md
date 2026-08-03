@@ -2,7 +2,7 @@
 name: technical-seo-implement
 description: >-
   Implements technical SEO fixes from a technical-seo-audit handoff.md
-  (IMP-* tasks) produced under audit/YYYY-MM-DD-HHmm/. Use when the user asks to
+  (IMP-* tasks) produced under reports/seo/YYYY-MM-DD-HHmm/. Use when the user asks to
   apply SEO audit recommendations, implement scorecard fixes, or follow up
   after a technical-seo-audit HTML report.
 ---
@@ -16,15 +16,15 @@ Implements fixes from a **technical-seo-audit** run. Do not re-run the full 69-r
 Prefer:
 
 ```text
-audit/YYYY-MM-DD-HHmm/handoff.md
+reports/seo/YYYY-MM-DD-HHmm/handoff.md
 ```
 
 Also useful:
 
-- `audit/YYYY-MM-DD-HHmm/index.html` (context)
-- `audit/YYYY-MM-DD-HHmm/meta.json` (counts / commit)
+- `reports/seo/YYYY-MM-DD-HHmm/index.html` (context)
+- `reports/seo/YYYY-MM-DD-HHmm/meta.json` (counts / commit)
 
-If the user points at an older `seo/*/technical-seo-scorecard.md`, still honor it, but prefer the new `audit/` layout.
+If the user points at an older `seo/*/technical-seo-scorecard.md`, still honor it, but prefer the new `reports/seo/` layout.
 
 If missing, ask for the audit folder path. If they need a new audit first → `technical-seo-audit`.
 
@@ -34,7 +34,7 @@ If missing, ask for the audit folder path. If they need a new audit first → `t
 2. Implement **High** then **Medium** `IMP-*` tasks. Skip **Low** unless the user asks.
 3. For each task: satisfy **Acceptance**, match project patterns, keep diffs focused.
 4. Preserve intentional `noindex` and notes from the audit.
-5. When done, write a short summary (and optionally `audit/YYYY-MM-DD-HHmm/implementation-summary.md`):
+5. When done, write a short summary (and optionally `reports/seo/YYYY-MM-DD-HHmm/implementation-summary.md`):
 
 ```markdown
 # SEO implementation summary

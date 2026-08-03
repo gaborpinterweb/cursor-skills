@@ -2,7 +2,7 @@
 name: technical-aeo-implement
 description: >-
   Implements technical AEO fixes from a technical-aeo-audit handoff.md
-  (IMP-* tasks) produced under aeo-audit/YYYY-MM-DD-HHmm/. Use when the user
+  (IMP-* tasks) produced under reports/aeo/YYYY-MM-DD-HHmm/. Use when the user
   asks to apply AEO/GEO audit recommendations, implement AI-visibility
   scorecard fixes, or follow up after a technical-aeo-audit HTML report.
 ---
@@ -16,14 +16,14 @@ Implements fixes from a **technical-aeo-audit** run. Do not re-run the full 47-r
 Prefer:
 
 ```text
-aeo-audit/YYYY-MM-DD-HHmm/handoff.md
+reports/aeo/YYYY-MM-DD-HHmm/handoff.md
 ```
 
 Also useful:
 
-- `aeo-audit/YYYY-MM-DD-HHmm/index.html` (context)
-- `aeo-audit/YYYY-MM-DD-HHmm/meta.json` (counts / commit)
-- `aeo-audit/YYYY-MM-DD-HHmm/attachments/` (Answerlint JSON/CSV context)
+- `reports/aeo/YYYY-MM-DD-HHmm/index.html` (context)
+- `reports/aeo/YYYY-MM-DD-HHmm/meta.json` (counts / commit)
+- `reports/aeo/YYYY-MM-DD-HHmm/attachments/` (Answerlint JSON/CSV context)
 
 If missing, ask for the audit folder path. If they need a new audit first → `technical-aeo-audit`.
 
@@ -34,7 +34,7 @@ If missing, ask for the audit folder path. If they need a new audit first → `t
 3. For each task: satisfy **Acceptance**, match project patterns, keep diffs focused.
 4. Preserve intentional choices noted in the audit (e.g. training-bot disallow vs search-bot allow, `n/a` FAQ/comparison pages).
 5. Prefer shared layouts/partials, JSON-LD in base templates, and content patterns that stay Answerlint-friendly (direct answers, schema matching visible FAQ, entity consistency).
-6. When done, write a short summary (and optionally `aeo-audit/YYYY-MM-DD-HHmm/implementation-summary.md`):
+6. When done, write a short summary (and optionally `reports/aeo/YYYY-MM-DD-HHmm/implementation-summary.md`):
 
 ```markdown
 # AEO implementation summary
