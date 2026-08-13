@@ -142,21 +142,25 @@ Base: <ref>
 
 Must-fix before merge. Cap: **8 rows**. Merge duplicates. Prefer highest
 severity. Number rows **1.1**, **1.2**, … in priority order. If none:
-`| — | — | None | — | — |`.
+`| — | — | None | — | — | — |`.
 
-| ID | Location | Issue | Guideline | Reference |
-|----|----------|-------|-----------|-----------|
-| 1.1 | `path:line` | Concrete problem | Which guideline | AGENTS/README section or existing file/pattern |
+| ID | Location | Issue | Guideline | Reference | Recommended fix |
+|----|----------|-------|-----------|-----------|-----------------|
+| 1.1 | `path:line` | Concrete problem | Which guideline | AGENTS/README section or existing file/pattern | Short concrete action (not a full patch) |
 
 ### Watchouts
 
 Non-obvious changes that may raise eyebrows from leads or fellow developers.
 Cap: **8 rows**. Number rows **2.1**, **2.2**, … in priority order. If none:
-`| — | — | None | — | — |`.
+`| — | — | None | — | — | — |`.
 
-| ID | Location | Change | Why it stands out | Reference |
-|----|----------|--------|-------------------|-----------|
-| 2.1 | `path:line` | What changed (short) | Why a lead/dev might question it | Related file, pattern, or AGENTS note |
+| ID | Location | Change | Why it stands out | Reference | Recommended fix |
+|----|----------|--------|-------------------|-----------|-----------------|
+| 2.1 | `path:line` | What changed (short) | Why a lead/dev might question it | Related file, pattern, or AGENTS note | Short suggestion, or `Confirm with lead` / `Document in PR` |
+
+**Recommended fix:** one line max. Point at the existing pattern to reuse when possible.
+Do not paste multi-line patches here — still review-only until the user asks to fix
+(e.g. `fix 1.2`).
 
 ## Severity rule
 
