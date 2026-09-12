@@ -4,10 +4,11 @@ description: >-
   Runs a technical Answer Engine Optimization (AEO) audit on a static-site
   frontend, evaluates ~47 rules across 10 checklist areas (plus Answerlint
   attachments), and writes a dated self-contained HTML report under
-  reports/aeo/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results,
-  attachments, and commit hash. Use when the user asks for an AEO audit, GEO
-  audit, AI visibility / citation readiness scorecard, or Answerlint-based
-  report.
+  reports/aeo/YYYY-MM-DD-HHmm/ (single-site) or
+  <site-dir>/reports/aeo/YYYY-MM-DD-HHmm/ (multi-site) with collapsible
+  pass/partial/fail results, attachments, and commit hash. Use when the user
+  asks for an AEO audit, GEO audit, AI visibility / citation readiness
+  scorecard, or Answerlint-based report.
 ---
 
 # Technical AEO Audit
@@ -30,12 +31,31 @@ Copy every user-attached audit artifact into the report folder (see below).
 
 Primary free attachment: [Answerlint](https://www.npmjs.com/package/answerlint) (`npx answerlint audit …`).
 
+## Report location (do this first)
+
+Inspect the **target repository** (the project being audited), not this skills repo. Use the git/repo root. Do **not** assume websites live in `sites/` — find them.
+
+A **website package** is a deployable frontend (own Hugo/Astro/Next/Eleventy/Vite config, `hugo.toml`/`config.toml`, or `content/`+`layouts/`, or a `package.json` that is a site app). Skip libs, APIs, `shared`, `node_modules`, `_template`, `.git`, `reports`.
+
+Find packages in this order; use the first parent that contains **2+** website packages:
+
+1. Common containers at repo root: `sites/`, `websites/`, `apps/`, `web/`, `frontends/`, `packages/`
+2. Workspace globs (`pnpm-workspace.yaml`, `package.json` `workspaces`, `turbo.json`, `nx.json`)
+3. Immediate repo-root children
+
+Then:
+
+- **2+ website packages** → multi-site. Report root: `<site-dir>/reports/aeo` (e.g. `websites/acme/reports/aeo`, `apps/marketing/reports/aeo`). Infer `<site-dir>` from the user, cwd, or changed/audited paths. If more than one could apply, ask.
+- **0 or 1 website package** → single-site. Report root: `reports/aeo` at the repo root. Do **not** nest under the site folder.
+
+Store `site` (slug or `null`), `siteDir` (path or `null`), and `reportRoot` in `meta.json`.
+
 ## Output layout
 
-Create (never reuse a folder name — each run gets its own directory):
+Create a new dated folder under the report root (never reuse a folder name):
 
 ```text
-reports/aeo/YYYY-MM-DD-HHmm/
+{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/
   index.html              # Main report (open this) — self-contained (CSS inlined)
   meta.json               # Machine-readable summary
   handoff.md              # For technical-aeo-implement
@@ -46,8 +66,10 @@ reports/aeo/YYYY-MM-DD-HHmm/
     <original-filename>
 ```
 
-- Always use **local date + time**: `reports/aeo/YYYY-MM-DD-HHmm/` (24h clock, zero-padded).
-- If that exact minute folder already exists, append seconds: `reports/aeo/YYYY-MM-DD-HHmmss/`.
+`{{REPORT_ROOT}}` is `reports/aeo` (single-site) or `<site-dir>/reports/aeo` (multi-site). Example: `reports/aeo/2026-07-24-1512/` or `websites/acme/reports/aeo/2026-07-24-1512/`.
+
+- Always use **local date + time**: `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/` (24h clock, zero-padded).
+- If that exact minute folder already exists, append seconds: `{{REPORT_ROOT}}/YYYY-MM-DD-HHmmss/`.
 - Resolve **git commit**: `git rev-parse --short HEAD` (and note dirty tree if `git status --porcelain` is non-empty). If not a git repo, set commit to `n/a`.
 - Resolve **commit URL** from `git remote get-url origin` (or first remote):
   - **GitHub** (`github.com`): `https://github.com/<owner>/<repo>/commit/<full-sha>`
@@ -60,7 +82,7 @@ reports/aeo/YYYY-MM-DD-HHmm/
 
 ## Workflow
 
-1. Create `reports/aeo/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
+1. Resolve the report root (above). Create `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
 2. Copy all provided attachments into `attachments/` (preserve filenames). Record them in `meta.json` and the HTML header as links (`target="_blank"` `rel="noopener"`).
 3. Copy this skill’s `SKILL.md` and `rules.md` into `skill-sources/` (verbatim). Embed the same full text behind the clickable **skill** / **rules** words in the method line.
 4. Record `model` (Cursor model name) and `analysisScope` (`static site files` / `a live URL` / `static site files and a live URL`).
@@ -135,7 +157,7 @@ Generate implementation tasks only for `fail` and `partial` rules with priority 
 # AEO implement handoff — YYYY-MM-DD
 
 Commit: <hash>
-Report: reports/aeo/YYYY-MM-DD-HHmm/index.html
+Report: {{REPORT_ROOT}}/YYYY-MM-DD-HHmm/index.html
 
 ## Tasks
 ### IMP-001 — <rule id> — <title>

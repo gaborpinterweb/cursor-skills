@@ -8,7 +8,7 @@ After an audit, ask Cursor to implement the SEO handoff / apply audit recommenda
 
 ## How it works
 
-1. Reads `audit/YYYY-MM-DD-HHmm/handoff.md` (ask for the path if missing).
+1. Reads `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/handoff.md` (ask for the path if missing). `{{REPORT_ROOT}}` is `reports/seo` (single-site) or `<site-dir>/reports/seo` (multi-site).
 2. Uses `index.html` / `meta.json` only for context when helpful.
 3. Implements **High**, then **Medium** `IMP-*` tasks. Skips **Low** unless you ask for full polish.
 4. For each task: meets **Acceptance**, follows existing project patterns, keeps the diff focused.
@@ -18,12 +18,14 @@ After an audit, ask Cursor to implement the SEO handoff / apply audit recommenda
 ## Required input
 
 ```text
-audit/YYYY-MM-DD-HHmm/handoff.md
+{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/handoff.md
 ```
+
+`{{REPORT_ROOT}}` is `reports/seo` (single-site) or `<site-dir>/reports/seo` (multi-site).
 
 Also useful: that folder’s `index.html` and `meta.json`.
 
-If you still have an older `seo/*/technical-seo-scorecard.md`, this skill can honor it, but prefer the `audit/` layout.
+If you still have an older `audit/` or `seo/*/technical-seo-scorecard.md` layout, this skill can honor it.
 
 ## Guardrails
 
@@ -40,4 +42,4 @@ If you still have an older `seo/*/technical-seo-scorecard.md`, this skill can ho
 
 ## Pairing
 
-Produced by [`technical-seo-audit`](../technical-seo-audit/). After implementing, re-audit in a new dated folder (ideally with fresh SF/PSI attachments).
+Produced by [`technical-seo-audit`](../technical-seo-audit/). After implementing, re-audit in a new dated folder (ideally with fresh SF/PSI attachments), then open the PR with [`technical-seo-pr`](../technical-seo-pr/).

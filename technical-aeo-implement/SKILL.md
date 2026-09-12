@@ -2,7 +2,8 @@
 name: technical-aeo-implement
 description: >-
   Implements technical AEO fixes from a technical-aeo-audit handoff.md
-  (IMP-* tasks) produced under reports/aeo/YYYY-MM-DD-HHmm/. Use when the user
+  (IMP-* tasks) produced under reports/aeo/YYYY-MM-DD-HHmm/ (single-site) or
+  <site-dir>/reports/aeo/YYYY-MM-DD-HHmm/ (multi-site). Use when the user
   asks to apply AEO/GEO audit recommendations, implement AI-visibility
   scorecard fixes, or follow up after a technical-aeo-audit HTML report.
 ---
@@ -13,17 +14,24 @@ Implements fixes from a **technical-aeo-audit** run. Do not re-run the full 47-r
 
 ## Required input
 
+Resolve the audit folder the same way as `technical-aeo-audit` (discover website packages; do not assume `sites/`):
+
+- **Single-site:** `reports/aeo/YYYY-MM-DD-HHmm/`
+- **Multi-site:** `<site-dir>/reports/aeo/YYYY-MM-DD-HHmm/` (infer `<site-dir>` from the user, cwd, or changed paths)
+
 Prefer:
 
 ```text
-reports/aeo/YYYY-MM-DD-HHmm/handoff.md
+{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/handoff.md
 ```
 
 Also useful:
 
-- `reports/aeo/YYYY-MM-DD-HHmm/index.html` (context)
-- `reports/aeo/YYYY-MM-DD-HHmm/meta.json` (counts / commit)
-- `reports/aeo/YYYY-MM-DD-HHmm/attachments/` (Answerlint JSON/CSV context)
+- `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/index.html` (context)
+- `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/meta.json` (counts / commit)
+- `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/attachments/` (Answerlint JSON/CSV context)
+
+If the user names a folder, use that. Honor older `aeo-audit/` or the other layout if that is where the run actually lives.
 
 If missing, ask for the audit folder path. If they need a new audit first → `technical-aeo-audit`.
 
@@ -34,7 +42,7 @@ If missing, ask for the audit folder path. If they need a new audit first → `t
 3. For each task: satisfy **Acceptance**, match project patterns, keep diffs focused.
 4. Preserve intentional choices noted in the audit (e.g. training-bot disallow vs search-bot allow, `n/a` FAQ/comparison pages).
 5. Prefer shared layouts/partials, JSON-LD in base templates, and content patterns that stay Answerlint-friendly (direct answers, schema matching visible FAQ, entity consistency).
-6. When done, write a short summary (and optionally `reports/aeo/YYYY-MM-DD-HHmm/implementation-summary.md`):
+6. When done, write a short summary (and optionally `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/implementation-summary.md`):
 
 ```markdown
 # AEO implementation summary

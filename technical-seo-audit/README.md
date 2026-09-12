@@ -8,7 +8,9 @@ Ask Cursor for a technical SEO audit, scorecard, or HTML audit report — especi
 
 ## How it works
 
-1. Creates a new dated folder `audit/YYYY-MM-DD-HHmm/` in the project (never reuses a previous run).
+1. Finds website packages in the target repo (`sites/`, `websites/`, `apps/`, or similar — not assumed), then creates a new dated folder (never reuses a previous run):
+   - single-site → `reports/seo/YYYY-MM-DD-HHmm/`
+   - multi-site → `<site-dir>/reports/seo/YYYY-MM-DD-HHmm/`
 2. Copies any attachments into `attachments/` and snapshots this skill’s `SKILL.md` + `rules.md` into `skill-sources/`.
 3. Evaluates every rule in [`rules.md`](rules.md) against the codebase (and attachments), scoring each as pass / partial / fail / n/a / unknown.
 4. Builds a self-contained `index.html` from [`report-template.html`](report-template.html) (CSS inlined) — pass-rate gauge, status tiles, By priority / By rule views, and collapsible findings.

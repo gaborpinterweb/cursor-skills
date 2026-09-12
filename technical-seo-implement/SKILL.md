@@ -2,8 +2,9 @@
 name: technical-seo-implement
 description: >-
   Implements technical SEO fixes from a technical-seo-audit handoff.md
-  (IMP-* tasks) produced under sites/<site>/reports/seo/YYYY-MM-DD-HHmm/. Use when the user asks to
-  apply SEO audit recommendations, implement scorecard fixes, or follow up
+  (IMP-* tasks) produced under reports/seo/YYYY-MM-DD-HHmm/ (single-site) or
+  <site-dir>/reports/seo/YYYY-MM-DD-HHmm/ (multi-site). Use when the user asks
+  to apply SEO audit recommendations, implement scorecard fixes, or follow up
   after a technical-seo-audit HTML report.
 ---
 
@@ -13,18 +14,23 @@ Implements fixes from a **technical-seo-audit** run. Do not re-run the full 69-r
 
 ## Required input
 
+Resolve the audit folder the same way as `technical-seo-audit` (discover website packages; do not assume `sites/`):
+
+- **Single-site:** `reports/seo/YYYY-MM-DD-HHmm/`
+- **Multi-site:** `<site-dir>/reports/seo/YYYY-MM-DD-HHmm/` (infer `<site-dir>` from the user, cwd, or changed paths)
+
 Prefer:
 
 ```text
-sites/<site>/reports/seo/YYYY-MM-DD-HHmm/handoff.md
+{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/handoff.md
 ```
 
 Also useful:
 
-- `sites/<site>/reports/seo/YYYY-MM-DD-HHmm/index.html` (context)
-- `sites/<site>/reports/seo/YYYY-MM-DD-HHmm/meta.json` (counts / commit)
+- `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/index.html` (context)
+- `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/meta.json` (counts / commit)
 
-If the user points at an older `seo/*/technical-seo-scorecard.md` or a repo-root `reports/seo/` folder, still honor it, but prefer `sites/<site>/reports/seo/`.
+If the user names a folder, use that. Honor older `audit/`, `seo/*/technical-seo-scorecard.md`, or the other layout if that is where the run actually lives.
 
 If missing, ask for the audit folder path. If they need a new audit first → `technical-seo-audit`.
 
@@ -35,7 +41,7 @@ If missing, ask for the audit folder path. If they need a new audit first → `t
 3. For each task: satisfy **Acceptance**, match project patterns, keep diffs focused.
 4. Preserve intentional `noindex` and notes from the audit.
 5. Walk **Common implementation pitfalls** against the diff. Fix anything that applies before calling the work done.
-6. When done, write a short summary (and optionally `sites/<site>/reports/seo/YYYY-MM-DD-HHmm/implementation-summary.md`):
+6. When done, write a short summary (and optionally `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/implementation-summary.md`):
 
 ```markdown
 # SEO implementation summary

@@ -31,4 +31,4 @@ Every finding needs a **Reference** (AGENTS section or existing file/pattern).
 
 ## Pairing
 
-Use before [`create-pr`](../create-pr/). For bugs use Bugbot; for vulns use Security Review.
+Use after [`review-understand`](../review-understand/) when you first need to parent AI output, then before [`create-pr`](../create-pr/). For bugs use Bugbot; for vulns use Security Review.

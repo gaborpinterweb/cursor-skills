@@ -8,7 +8,7 @@ After an AEO audit, ask Cursor to implement the AEO handoff / apply AI-visibilit
 
 ## How it works
 
-1. Reads `aeo-audit/YYYY-MM-DD-HHmm/handoff.md` (ask for the path if missing).
+1. Reads `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/handoff.md` (ask for the path if missing). `{{REPORT_ROOT}}` is `reports/aeo` (single-site) or `<site-dir>/reports/aeo` (multi-site).
 2. Uses `index.html` / `meta.json` / attachments only for context when helpful.
 3. Implements **High**, then **Medium** `IMP-*` tasks. Skips **Low** unless you ask for full polish.
 4. For each task: meets **Acceptance**, follows existing project patterns, keeps the diff focused.
@@ -18,8 +18,10 @@ After an AEO audit, ask Cursor to implement the AEO handoff / apply AI-visibilit
 ## Required input
 
 ```text
-aeo-audit/YYYY-MM-DD-HHmm/handoff.md
+{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/handoff.md
 ```
+
+`{{REPORT_ROOT}}` is `reports/aeo` (single-site) or `<site-dir>/reports/aeo` (multi-site).
 
 Also useful: that folder’s `index.html`, `meta.json`, and Answerlint attachments.
 

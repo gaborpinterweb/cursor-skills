@@ -3,9 +3,10 @@ name: technical-seo-audit
 description: >-
   Runs a technical SEO audit on a static-site frontend, evaluates 60+ rules
   (15 checklist areas + Screaming Frog Issues), and writes a dated HTML report
-  under reports/seo/YYYY-MM-DD-HHmm/ with collapsible pass/partial/fail results,
-  attachments, and commit hash. Use when the user asks for a technical SEO
-  audit, SEO scorecard, or audit report.
+  under reports/seo/YYYY-MM-DD-HHmm/ (single-site) or
+  <site-dir>/reports/seo/YYYY-MM-DD-HHmm/ (multi-site) with collapsible
+  pass/partial/fail results, attachments, and commit hash. Use when the user
+  asks for a technical SEO audit, SEO scorecard, or audit report.
 ---
 
 # Technical SEO Audit
@@ -26,12 +27,31 @@ User asks for a technical SEO audit / scorecard / HTML audit report, or attaches
 
 Copy every user-attached audit artifact into the report folder (see below).
 
+## Report location (do this first)
+
+Inspect the **target repository** (the project being audited), not this skills repo. Use the git/repo root. Do **not** assume websites live in `sites/` — find them.
+
+A **website package** is a deployable frontend (own Hugo/Astro/Next/Eleventy/Vite config, `hugo.toml`/`config.toml`, or `content/`+`layouts/`, or a `package.json` that is a site app). Skip libs, APIs, `shared`, `node_modules`, `_template`, `.git`, `reports`.
+
+Find packages in this order; use the first parent that contains **2+** website packages:
+
+1. Common containers at repo root: `sites/`, `websites/`, `apps/`, `web/`, `frontends/`, `packages/`
+2. Workspace globs (`pnpm-workspace.yaml`, `package.json` `workspaces`, `turbo.json`, `nx.json`)
+3. Immediate repo-root children
+
+Then:
+
+- **2+ website packages** → multi-site. Report root: `<site-dir>/reports/seo` (e.g. `websites/acme/reports/seo`, `apps/marketing/reports/seo`). Infer `<site-dir>` from the user, cwd, or changed/audited paths. If more than one could apply, ask.
+- **0 or 1 website package** → single-site. Report root: `reports/seo` at the repo root. Do **not** nest under the site folder.
+
+Store `site` (slug or `null`), `siteDir` (path or `null`), and `reportRoot` in `meta.json`.
+
 ## Output layout
 
-Create (never reuse a folder name — each run gets its own directory):
+Create a new dated folder under the report root (never reuse a folder name):
 
 ```text
-reports/seo/YYYY-MM-DD-HHmm/
+{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/
   index.html              # Main report (open this) — self-contained (CSS inlined)
   meta.json               # Machine-readable summary
   handoff.md              # For technical-seo-implement
@@ -42,8 +62,10 @@ reports/seo/YYYY-MM-DD-HHmm/
     <original-filename>
 ```
 
-- Always use **local date + time**: `reports/seo/YYYY-MM-DD-HHmm/` (24h clock, zero-padded). Example: `reports/seo/2026-07-24-1512/`.
-- If that exact minute folder already exists, append seconds: `reports/seo/YYYY-MM-DD-HHmmss/`.
+`{{REPORT_ROOT}}` is `reports/seo` (single-site) or `<site-dir>/reports/seo` (multi-site). Example: `reports/seo/2026-07-24-1512/` or `websites/acme/reports/seo/2026-07-24-1512/`.
+
+- Always use **local date + time**: `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/` (24h clock, zero-padded).
+- If that exact minute folder already exists, append seconds: `{{REPORT_ROOT}}/YYYY-MM-DD-HHmmss/`.
 - Resolve **git commit**: `git rev-parse --short HEAD` (and note dirty tree if `git status --porcelain` is non-empty). If not a git repo, set commit to `n/a`.
 - Resolve **commit URL** from `git remote get-url origin` (or first remote):
   - **GitHub** (`github.com`): `https://github.com/<owner>/<repo>/commit/<full-sha>`
@@ -56,7 +78,7 @@ reports/seo/YYYY-MM-DD-HHmm/
 
 ## Workflow
 
-1. Create `reports/seo/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
+1. Resolve the report root (above). Create `{{REPORT_ROOT}}/YYYY-MM-DD-HHmm/`, `attachments/`, and `skill-sources/`.
 2. Copy all provided attachments into `attachments/` (preserve filenames). Record them in `meta.json` and the HTML header as links (`target="_blank"` `rel="noopener"`).
 3. Copy this skill’s `SKILL.md` and `rules.md` into `skill-sources/` (verbatim). Embed the same full text behind the clickable **skill** / **rules** words in the method line.
 4. Record `model` (Cursor model name) and `analysisScope` (`static site files` / `a live URL` / `static site files and a live URL`).
@@ -122,7 +144,7 @@ Zero counts: use `<span class="count count-zero">0</span>` or `stat-tile is-zero
 
 Use only the CSS classes already defined in the template’s inlined `<style>` block — unified design across audits. Keep styles embedded in `index.html` so the report renders correctly when opened alone (without `attachments/` or other sibling files).
 
-When filling `{{EMBED_SKILL_MD}}` / `{{EMBED_RULES_MD}}`, HTML-escape the full file text into the modal `<pre class="skill-file-body">` blocks (replace those exact placeholders only — do not globally replace bare `{{SKILL_MD}}` / `{{RULES_MD}}` strings that may appear inside the skill docs). Also copy the files to `skill-sources/SKILL.md` and `skill-sources/rules.md`. Store `skillName`, `model`, `analysisScope`, and `byArea` in `meta.json`.
+When filling `{{EMBED_SKILL_MD}}` / `{{EMBED_RULES_MD}}`, HTML-escape the full file text into the modal `<pre class="skill-file-body">` blocks (replace those exact placeholders only — do not globally replace bare `{{SKILL_MD}}` / `{{RULES_MD}}` strings that may appear inside the skill docs). Also copy the files to `skill-sources/SKILL.md` and `skill-sources/rules.md`. Store `site`, `siteDir`, `reportRoot`, `folder`, `skillName`, `model`, `analysisScope`, and `byArea` in `meta.json`.
 
 Each modal header includes **Copy** (clipboard) and **Close**. Keep those controls; do not remove the footer script that colors overview rows, opens modals without scrolling, and handles Copy.
 
@@ -141,7 +163,7 @@ Generate implementation tasks only for `fail` and `partial` rules with priority 
 # SEO implement handoff — YYYY-MM-DD
 
 Commit: <hash>
-Report: reports/seo/YYYY-MM-DD-HHmm/index.html
+Report: {{REPORT_ROOT}}/YYYY-MM-DD-HHmm/index.html
 
 ## Tasks
 ### IMP-001 — <rule id> — <title>
