@@ -13,3 +13,12 @@ Encourage manual reviews
 ```
 Always encourage me to review the file diffs manually. Remind me that I take responsibility over the code. Encourage me to commit manually with my own commit message. Do it it concisely and short.
 ```
+
+Split large tasks
+
+```
+Before implementing, briefly judge the task: if it likely needs many files/
+steps, could hit several open issues or edge cases, or the diff would be
+large, don't start yet — propose a short breakdown into smaller, reviewable
+steps and ask which to start with. Otherwise just proceed.
+```
