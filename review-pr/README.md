@@ -1,6 +1,6 @@
-# preview-pr
+# review-pr
 
-Cursor skill that **previews an open PR** for the current (or named) branch:
+Cursor skill that **reviews an open PR** for the current (or named) branch:
 sync gate, resolve via `gh`, optional reuse of `/review-branch` from chat, then
 align PR description and open feedback against the diff. Optionally reviews
 Linear tickets vs implementation after you confirm a fetch. Review-only; it does
@@ -8,7 +8,7 @@ Linear tickets vs implementation after you confirm a fetch. Review-only; it does
 
 ## When to use it
 
-Ask Cursor to preview a PR, run `/preview-pr`, or do a pre-merge PR context
+Ask Cursor to review a PR, run `/review-pr`, or do a pre-merge PR context
 check before human review.
 
 ## How it works

@@ -1,18 +1,19 @@
 ---
-name: preview-pr
+name: review-pr
 description: >-
-  Previews an open PR for the current (or named) branch: sync gate, resolve via
+  Reviews an open PR for the current (or named) branch: sync gate, resolve via
   gh, optionally reuse /review-branch from chat, then align PR description and
   open feedback against the diff, and optionally review Linear tickets vs
-  implementation. Use when the user runs /preview-pr, asks to preview a PR, or
+  implementation. Use when the user runs /review-pr, asks to review a PR, or
   wants a pre-merge PR context check.
 disable-model-invocation: true
 ---
 
-# Preview PR
+# Review PR
 
-Review-only PR preview. Do **not** fix code, edit the PR, or run `/review-branch`
-unless the user explicitly asks. Prefer `gh` over inventing MCP calls for GitHub.
+Review-only PR context check. Do **not** fix code, edit the PR, or run
+`/review-branch` unless the user explicitly asks. Prefer `gh` over inventing MCP
+calls for GitHub.
 
 ## Workflow
 
