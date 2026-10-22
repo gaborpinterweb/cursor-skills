@@ -1,10 +1,11 @@
 # Cursor skills
 
-Personal Cursor Agent skills for technical SEO and AEO audits, follow-up fixes, understanding AI diffs, branch review, and PR drafting.
+Personal Cursor Agent skills for technical SEO and AEO audits, follow-up fixes, understanding AI diffs, explaining scoped diffs, branch review, and PR drafting.
 
 | Skill name | Description |
 |---|---|
 | [create-pr](create-pr/) | Drafts a PR message (ticket, changes, decisions, links), asks for confirmation, then creates the PR with gh. |
+| [explain-changes](explain-changes/) | Explains intention and behaviour of diffs for a listed file set vs origin/main or origin/master (not a review). |
 | [review-branch](review-branch/) | Reviews the current branch against main/master for regressions, globals, reuse, naming, magic values, and AGENTS/README compliance. |
 | [technical-seo-audit](technical-seo-audit/) | Runs a technical SEO audit and writes a dated HTML report plus handoff. |
 | [technical-seo-implement](technical-seo-implement/) | Implements High/Medium fixes from an SEO audit `handoff.md`. |
