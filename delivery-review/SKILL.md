@@ -2,10 +2,12 @@
 name: delivery-review
 description: >-
   Delivery overview of the open PR for the current (or named) branch: code
-  review (branch/AGENTS compliance), PR review (description and feedback vs
-  diff), and Linear ticket review vs implementation. Emits three concise
-  tables (C# / P# / T#). Use when the user runs /delivery-review or /review-pr,
-  asks for a delivery review, or wants a pre-merge overview.
+  review (branch/AGENTS compliance, including silent CSS regressions), PR
+  review (description and feedback vs diff), and Linear ticket review vs
+  implementation. Emits three concise tables (C# / P# / T#) plus Manual
+  regression checks when UI CSS/overlays moved. Use when the user runs
+  /delivery-review or /review-pr, asks for a delivery review, or wants a
+  pre-merge overview.
 disable-model-invocation: true
 ---
 
@@ -59,12 +61,16 @@ git diff <merge-base>...HEAD
 ### 3. Code review (→ table **C**)
 
 Apply the **`review-branch`** skill rules (read that skill if needed): AGENTS /
-README / sibling patterns, regressions, globals, reuse, naming, magic values,
-dead code, diff-scoped a11y/i18n/CI/secrets.
+README / sibling patterns, regressions (including silent CSS cascade /
+specificity / overflow), globals, reuse, naming, magic values, dead code,
+diff-scoped a11y/i18n/CI/secrets, and **Manual regression checks** when UI
+CSS/markup or interactive overlays moved.
 
 Reuse a `/review-branch` result from **this chat** only if it matches the
 current branch tip; otherwise run the review now. Map Critical → ⛔️, Watchouts
-→ ⚠️. Cap **8** rows. Evidence required.
+→ ⚠️. Cap **8** rows. Evidence required. Carry forward that skill’s
+**Manual regression checks** section into this reply (same steps; do not drop
+them when compressing into tables).
 
 ### 4. PR review (→ table **P**)
 
@@ -90,8 +96,9 @@ mismatch. Cap **8**.
 
 ## Output format
 
-Always emit **all three** tables, in this order. Keep Description and Suggestion
-to **one short line each**. No essays, no patches.
+Always emit **all three** tables, in this order, then **Manual regression
+checks** from the code pass when `review-branch` would emit them. Keep
+Description and Suggestion to **one short line each**. No essays, no patches.
 
 ```text
 PR: #<n> <url>
@@ -103,27 +110,42 @@ Sync: ok | waived
 
 | Number | Type | Description | Reference | Suggestion |
 |--------|------|-------------|-----------|------------|
-| C1 | ⛔️ or ⚠️ | Short issue | [`path:line`](link) or AGENTS cite | Short action |
+| C1 | ⛔️ or ⚠️ | Short issue | `` `path:line` `` · vs origin/main | Short action |
 
 ### PR
 
 | Number | Type | Description | Reference | Suggestion |
 |--------|------|-------------|-----------|------------|
-| P1 | ⛔️ or ⚠️ | Short mismatch / open feedback | [PR body](url) / comment / `path` | Short action |
+| P1 | ⛔️ or ⚠️ | Short mismatch / open feedback | [comment](url) or `` `path:line` `` | Short action |
 
 ### Ticket
 
 | Number | Type | Description | Reference | Suggestion |
 |--------|------|-------------|-----------|------------|
-| T1 | ⛔️ or ⚠️ | Short gap vs ticket | [`TEAM-123`](ticket-url) + `path` | Short action |
+| T1 | ⛔️ or ⚠️ | Short gap vs ticket | [`TEAM-123`](ticket-url) + `` `path:line` `` | Short action |
 
 **Numbering:** `C1…Cn`, `P1…Pn`, `T1…Tn` in priority order within each table.
 
 **Empty table:** one row `| — | — | None | — | — |`.
 
-**Reference:** must be clickable when a URL or path link is available (repo file
-blob/permalink, PR comment URL, Linear issue URL). Plain `path:line` only if no
-link can be built.
+**Reference — code (required shape):**
+
+- Always a **local workspace path with line** (or range): `` `path/to/file.ext:12` ``
+  or `` `path/to/file.ext:12-18` ``. Workspace-relative. Never a GitHub/GitLab
+  blob or permalink for code — those leave the editor.
+- When the file differs from the PR base, append ` · vs origin/<baseRefName>`
+  (the same base as the header). That marks the row as diffable.
+- AGENTS/README cites stay as plain text section pointers (e.g. `AGENTS.md § CSS`),
+  not remote links.
+- Non-code only: PR comment / review URLs and Linear issue URLs stay as markdown
+  links. If a row also needs code, add `` `path:line` `` beside them.
+
+**Follow-ups (by row number):**
+
+| User says | Do |
+|-----------|----|
+| `C2` / `expand P1` | Short detail for that row (still no patch unless asked). |
+| `diff C1` / `open C1` | For a code row: show the hunk vs `origin/<baseRefName>` for that path (`git diff origin/<base> -- path`), focused on the cited lines. Prefer the editor-friendly local path in the reply so they can click through. |
 
 **Type:**
 
@@ -132,12 +154,16 @@ link can be built.
 | ⛔️ | Blocking — fix or explicitly waive before merge |
 | ⚠️ | Warning — non-blocking, still worth a look |
 
-End with: review file diffs manually; you own commits and messages. Offer to
-expand any row by number on request.
+After the three tables, if the code pass produced **Manual regression checks**,
+emit that section unchanged (or `None (no UI CSS or interactive markup in diff)`).
+
+End with: review file diffs manually; you own commits and messages. Remind that
+`diff <id>` opens the change vs the PR base for that row.
 
 ## Hard rules
 
 - Do not invent PR numbers, comment text, ticket AC, or evidence.
 - Do not open, edit, or merge the PR.
+- Do not put GitHub/blob URLs in Reference for code — local `path:line` only.
 - Prefer fewer evidenced rows over speculative noise.
 - Not a substitute for Bugbot or Security Review.

@@ -16,23 +16,26 @@ overview before human review.
 
 1. Sync gate: local HEAD vs remote tip; asks you to sync if they differ.
 2. Resolves the open PR for the branch with `gh`.
-3. **Code** — branch/AGENTS compliance (same rules as [`review-branch`](../review-branch/)); reuses a matching chat result when present.
+3. **Code** — branch/AGENTS compliance (same rules as [`review-branch`](../review-branch/), including silent CSS regressions); reuses a matching chat result when present; carries **Manual regression checks** when UI CSS/overlays moved.
 4. **PR** — description, open feedback, and conversation vs the current diff.
 5. **Ticket** — Linear IDs from PR/branch/commits vs implementation when Linear is usable.
 
 ## Output
 
-Three tables, always:
+Three tables, always, then Manual regression checks when the code pass requires them:
 
 | Table | Numbers | Focus |
 |-------|---------|-------|
-| Code | C1… | Pattern / AGENTS / regressions |
+| Code | C1… | Pattern / AGENTS / regressions (incl. silent CSS) |
 | PR | P1… | Description & review feedback |
 | Ticket | T1… | Linear AC vs diff |
+| Manual checks | 1…8 | Browser / prod-vs-preview steps (when UI CSS/overlays moved) |
 
 Columns: Number · Type (⛔️ / ⚠️) · Description · Reference · Suggestion.
 
-Ask for details by number (e.g. `expand C2`).
+**Code references are local** (`` `path:line` ``), never GitHub blobs. Diffable
+rows append ` · vs origin/<base>`. Ask for details with `C2`, or `diff C1` for
+the hunk against the PR base.
 
 ## Key files
 

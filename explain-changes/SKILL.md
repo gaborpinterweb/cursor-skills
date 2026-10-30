@@ -62,8 +62,8 @@ Per file, identify the behavioural units that changed:
 Skip pure formatting, renames with no behaviour change, and noise unless the
 user asks for everything.
 
-Group by concern when one file mixes features (e.g. only the ecommerce helpers,
-not an unrelated consent helper that also landed in the same file). Prefer the
+Group by concern when one file mixes features (e.g. only the feature helpers in
+scope, not an unrelated helper that also landed in the same file). Prefer the
 user’s stated ticket/scope when present.
 
 ## Output format
