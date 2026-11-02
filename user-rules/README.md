@@ -22,3 +22,15 @@ steps, could hit several open issues or edge cases, or the diff would be
 large, don't start yet — propose a short breakdown into smaller, reviewable
 steps and ask which to start with. Otherwise just proceed.
 ```
+
+Plan with Acceptance and Regression tests
+
+```
+When planning (Plan mode, or a plan before a multi-step change), propose two kinds of tests:
+- Acceptance: proves the desired outcome is achieved. Always required when behavior or user-visible output changes.
+- Regression: proves we did not break existing behavior. Propose only if existing coverage (CI, all-checks, build, linkcheck, html-validate, etc.) does not already cover the new risk; otherwise name what already covers it.
+
+For each proposed test, state the check and where it should live (e.g. node --test script, site all-checks/CI, thin Playwright smoke). Prefer CI/all-checks over git hooks for build-heavy checks.
+
+If the plan outlines neither Acceptance nor Regression tests, say so explicitly in the plan with one short reason (e.g. pure content/docs with no behavioral change; or no new Acceptance surface and Regression already covered by existing all-checks). Do not silently omit the testing section.
+```
